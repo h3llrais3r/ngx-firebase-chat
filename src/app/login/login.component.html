@@ -1,0 +1,32 @@
+<hr>
+<h1>Login</h1>
+<hr>
+<div class="container-fluid">
+  <div *ngIf="error" class="alert alert-danger">
+    <strong>Error!</strong> {{error}}
+  </div>
+  <div class="center">
+    <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12 col-centered">
+      <div class="form-group required">
+        <label for="email">Email</label>
+        <input type="text" [(ngModel)]="email" id="email" placeholder="Email..." name="email" class="form-control" required>
+      </div>
+      <div class="form-group required">
+        <label for="password">Password</label>
+        <input type="password" [(ngModel)]="password" id="password" placeholder="Password..." name="password" class="form-control" required>
+      </div>
+      <button type="button" class="btn btn-primary" (click)="login()">Login</button>
+      <button type="button" class="btn btn-default" (click)="cancel()">Cancel</button>
+    </div>
+    <br />
+    <br />
+    <div class="text-center">
+      <h4>Login with</h4>
+      <a (click)="loginWithFacebook()" class="btn btn-primary bt-social disabled" data-provider="facebook">Facebook</a>
+      <a (click)="loginWithTwitter()" class="btn btn-info bt-social disabled" data-provider="twitter">Twitter</a>
+      <a (click)="loginWithGoogle()" class="btn btn-danger bt-social" data-provider="google">Google</a>
+      <a (click)="loginWithGithub()" class="btn btn-default bt-social" data-provider="github">GitHub</a>
+      <a (click)="loginAnonymously()" class="btn btn-warning">Anonymous</a>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,21 @@
+.chat {
+  text-align: left;
+}
+
+.chat-user {
+  color: darkblue;
+  font-weight: bold;
+}
+
+.chat-timestamp {
+  font-weight: lighter;
+  font-style: italic;
+}
+
+.chat-message {
+  font-weight: bold;
+}
+
+.mychat {
+  background-color: lightgray;
+}

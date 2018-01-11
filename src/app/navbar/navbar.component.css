@@ -1,0 +1,10 @@
+li a {
+  cursor: pointer;
+}
+
+.greeting {
+  color: white;
+  font-weight: bold;
+  padding: 15px;
+  display: block;
+}
