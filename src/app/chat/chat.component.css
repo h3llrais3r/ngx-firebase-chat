@@ -20,6 +20,14 @@
   background-color: lightgray;
 }
 
+.btn-emoji {
+  background: url(/assets/emoji.png);
+  background-repeat: no-repeat;
+  background-position-y: center;
+  background-color: #eee;
+  background-size: 24px;
+}
+
 
 /*Use ::ng-deep until https://github.com/lbertenasco/ng-emoji-picker/issues/12 is fixed */
 

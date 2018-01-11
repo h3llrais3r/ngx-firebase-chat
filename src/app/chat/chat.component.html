@@ -6,8 +6,8 @@
       <div class="form-group">
         <label for="message">Chat message</label>
         <div class="input-group">
-          <input [(ngModel)]="message" (ngModelChange)="emojify()" (keyup.enter)="submitChat()" type="text" class="form-control" id="message" name="message" placeholder="message...">
-          <div class="input-group-addon btn" (click)="openPopup()">:)</div>
+          <input [(ngModel)]="message" (ngModelChange)="emojify()" (click)="openPopup(false)" (keyup.enter)="submitChat()" type="text" class="form-control" id="message" name="message" placeholder="message...">
+          <div class="input-group-addon btn btn-emoji" (click)="openPopup()"></div>
         </div>
         <emoji-input [(model)]="message" class="emoji-input" (emojiClick)="focus()" (click)="openPopup(false)" (setPopupAction)="setPopupAction($event)"></emoji-input>
       </div>
