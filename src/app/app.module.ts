@@ -2,10 +2,10 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-
 import { AngularFireModule } from 'angularfire2';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { AngularFireAuthModule } from 'angularfire2/auth';
+import { EmojiPickerModule } from 'ng-emoji-picker';
 
 import { AppRoutingModule } from './app-routing.module';
 import { SharedModule } from './shared/shared.module';
@@ -38,10 +38,14 @@ import { ChatService } from './chat/chat.service';
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireDatabaseModule,
     AngularFireAuthModule,
+    EmojiPickerModule,
     AppRoutingModule,
     SharedModule
   ],
-  providers: [AuthService, ChatService],
+  providers: [
+    AuthService,
+    ChatService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -5,12 +5,16 @@
     <div class="col-md-6 col-md-offset-3">
       <div class="form-group">
         <label for="message">Chat message</label>
-        <input [(ngModel)]="message" type="text" class="form-control" id="message" name="message" placeholder="message...">
+        <div class="input-group">
+          <input [(ngModel)]="message" (ngModelChange)="emojify()" (keyup.enter)="submitChat()" type="text" class="form-control" id="message" name="message" placeholder="message...">
+          <div class="input-group-addon btn" (click)="openPopup()">:)</div>
+        </div>
+        <emoji-input [(model)]="message" class="emoji-input" (emojiClick)="focus()" (click)="openPopup(false)" (setPopupAction)="setPopupAction($event)"></emoji-input>
       </div>
       <button class="btn btn-primary" (click)="submitChat()">Submit</button>
       <hr>
       <ul class="list-group">
-        <li class="list-group-item chat" [ngClass]="{'mychat': isMyChat(chat)}" *ngFor="let chat of chatMessages">
+        <li class="list-group-item chat" [ngClass]="{'mychat': isMyChat(chat)}" *ngFor="let chat of chats">
           <span class="chat-user">{{chat.user}} </span>
           <span class="chat-timestamp">({{chat.timestamp}}): </span>
           <span class="chat-message">{{chat.message}}</span>
