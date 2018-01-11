@@ -37,6 +37,10 @@ export class NavbarComponent implements OnInit {
     return this.currentUser;
   }
 
+  isAuthenticatedAsAdmin(): boolean {
+    return this.currentUser && this.currentUser.displayName === 'admin';
+  }
+
   loginAnonymously(): void {
     this.authService.loginAnonymously();
   }

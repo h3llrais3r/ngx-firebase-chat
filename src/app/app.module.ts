@@ -17,6 +17,7 @@ import { HomeComponent } from './home/home.component';
 import { RegisterComponent } from './register/register.component';
 import { LoginComponent } from './login/login.component';
 import { ChatComponent } from './chat/chat.component';
+import { ChatRoomComponent } from './chat/chat-room.component';
 import { AdminComponent } from './admin/admin.component';
 import { AuthService } from './auth/auth.service';
 import { ChatService } from './chat/chat.service';
@@ -29,6 +30,7 @@ import { ChatService } from './chat/chat.service';
     RegisterComponent,
     LoginComponent,
     ChatComponent,
+    ChatRoomComponent,
     AdminComponent
   ],
   imports: [

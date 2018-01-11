@@ -5,6 +5,7 @@ import { RegisterComponent } from './register/register.component';
 import { LoginComponent } from './login/login.component';
 import { AdminComponent } from './admin/admin.component';
 import { ChatComponent } from './chat/chat.component';
+import { ChatRoomComponent } from './chat/chat-room.component';
 import { HomeComponent } from './home/home.component';
 
 const routes: Routes = [
@@ -28,6 +29,10 @@ const routes: Routes = [
   {
     path: 'chat',
     component: ChatComponent
+  },
+  {
+    path: 'chatroom',
+    component: ChatRoomComponent
   },
   {
     path: 'admin',

@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { EmojiService } from 'ng-emoji-picker';
 
-import { AuthService } from '../auth/auth.service';
-import { ChatService } from './chat.service';
 import { Chat } from './chat';
+import { ChatRoom } from './chat-room';
+import { ChatService } from './chat.service';
+import { AuthService } from '../auth/auth.service';
 
 declare var $; // declare jquery
 
@@ -13,6 +14,9 @@ declare var $; // declare jquery
   styleUrls: ['./chat.component.css']
 })
 export class ChatComponent implements OnInit {
+
+  @Input()
+  chatRoom: ChatRoom;
 
   currentUser: any;
   chats: any[];
@@ -25,7 +29,7 @@ export class ChatComponent implements OnInit {
     private emojiService: EmojiService) { }
 
   ngOnInit(): void {
-    this.chatService.getChats().valueChanges().subscribe(chats => this.chats = chats.reverse());
+    this.chatService.getChats(this.chatRoom).valueChanges().subscribe(chats => this.chats = chats.reverse());
     this.authService.getAuthState().subscribe(user => this.currentUser = user);
   }
 
@@ -52,7 +56,7 @@ export class ChatComponent implements OnInit {
     let chat = new Chat(this.getChatUser(), new Date(), this.message);
     console.log('Submitting chat message');
     console.log(chat);
-    this.chatService.submitChat(chat);
+    this.chatService.submitChat(chat, this.chatRoom);
     this.message = '';
   }
 
