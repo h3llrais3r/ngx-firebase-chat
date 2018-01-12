@@ -22,6 +22,7 @@ export class ChatComponent implements OnInit {
   currentUser: any;
   chats: any[];
   message: string = '';
+  notifyNewChats: boolean = false;
 
   openPopup: Function;
 
@@ -29,7 +30,6 @@ export class ChatComponent implements OnInit {
     private chatService: ChatService,
     private emojiService: EmojiService,
     private pushNotificationsService: PushNotificationsService) {
-    console.log('request permission');
     this.pushNotificationsService.requestPermission();
   }
 
@@ -37,14 +37,9 @@ export class ChatComponent implements OnInit {
     this.chatService.getChats(this.chatRoom).valueChanges()
       .subscribe(chats => {
         this.chats = chats.reverse();
-        console.log(this.chats[0].user);
-        // Don't show notification for own messages
-        if (this.chats[0].user !== this.getChatUser()) {
-          this.pushNotificationsService.create('New chat available', { body: 'Hurry up and read it! :-)' })
-            .subscribe(
-            res => console.log(res),
-            err => console.log(err)
-            );
+        // Don't show notification for my own chats
+        if (this.notifyNewChats && this.chats[0].user !== this.getChatUser()) {
+          this.pushNotificationsService.create('New chat available').subscribe();
         }
       });
     this.authService.getAuthState().subscribe(user => this.currentUser = user);
