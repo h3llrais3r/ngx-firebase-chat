@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { EmojiService } from 'ng-emoji-picker';
+import { PushNotificationsService } from 'ng-push';
 
 import { Chat } from './chat';
 import { ChatRoom } from './chat-room';
@@ -26,10 +27,26 @@ export class ChatComponent implements OnInit {
 
   constructor(private authService: AuthService,
     private chatService: ChatService,
-    private emojiService: EmojiService) { }
+    private emojiService: EmojiService,
+    private pushNotificationsService: PushNotificationsService) {
+    console.log('request permission');
+    this.pushNotificationsService.requestPermission();
+  }
 
   ngOnInit(): void {
-    this.chatService.getChats(this.chatRoom).valueChanges().subscribe(chats => this.chats = chats.reverse());
+    this.chatService.getChats(this.chatRoom).valueChanges()
+      .subscribe(chats => {
+        this.chats = chats.reverse();
+        console.log(this.chats[0].user);
+        // Don't show notification for own messages
+        if (this.chats[0].user !== this.getChatUser()) {
+          this.pushNotificationsService.create('New chat available', { body: 'Hurry up and read it! :-)' })
+            .subscribe(
+            res => console.log(res),
+            err => console.log(err)
+            );
+        }
+      });
     this.authService.getAuthState().subscribe(user => this.currentUser = user);
   }
 
@@ -52,12 +69,15 @@ export class ChatComponent implements OnInit {
     this.message = this.emojiService.emojify(this.message);
   }
 
-  submitChat(): void {
-    let chat = new Chat(this.getChatUser(), new Date(), this.message);
-    console.log('Submitting chat message');
-    console.log(chat);
-    this.chatService.submitChat(chat, this.chatRoom);
-    this.message = '';
+  submitChat(event: any): void {
+    // Only submit real message (don't submit empty ones)
+    if (this.message) {
+      let chat = new Chat(this.getChatUser(), new Date(), this.message);
+      console.log('Submitting chat message');
+      console.log(chat);
+      this.chatService.submitChat(chat, this.chatRoom);
+      this.message = '';
+    }
   }
 
   isMyChat(chat: Chat): boolean {

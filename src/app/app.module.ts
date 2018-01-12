@@ -6,6 +6,7 @@ import { AngularFireModule } from 'angularfire2';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import { EmojiPickerModule } from 'ng-emoji-picker';
+import { PushNotificationsModule } from 'ng-push';
 
 import { AppRoutingModule } from './app-routing.module';
 import { SharedModule } from './shared/shared.module';
@@ -41,6 +42,7 @@ import { ChatService } from './chat/chat.service';
     AngularFireDatabaseModule,
     AngularFireAuthModule,
     EmojiPickerModule,
+    PushNotificationsModule,
     AppRoutingModule,
     SharedModule
   ],
