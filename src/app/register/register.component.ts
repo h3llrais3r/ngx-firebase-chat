@@ -28,7 +28,7 @@ export class RegisterComponent implements OnInit {
           this.authService.updateProfile(this.name)
             .then(res => {
               console.log('profile updated');
-              this.router.navigateByUrl('/chat');
+              this.router.navigateByUrl('/home');
             })
             .catch(err => {
               console.error(err);

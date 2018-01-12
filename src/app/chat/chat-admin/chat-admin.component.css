@@ -1,0 +1,12 @@
+.chat-room-active {
+  background-color: #337ab7;
+  font-weight: bold;
+}
+
+.chat-room-active a {
+  color: #ffffff;
+}
+
+li a {
+  cursor: pointer;
+}

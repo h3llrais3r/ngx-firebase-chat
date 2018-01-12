@@ -23,7 +23,7 @@ export class LoginComponent implements OnInit {
     if (this.email && this.password) {
       this.authService.loginWithEmailAndPassword(this.email, this.password)
         .then(res => {
-          this.router.navigateByUrl('/chat');
+          this.router.navigateByUrl('/home');
         })
         .catch(err => {
           console.error(err);
@@ -37,7 +37,7 @@ export class LoginComponent implements OnInit {
   loginWithFacebook(): void {
     this.authService.loginWithFacebook()
       .then(res => {
-        this.router.navigateByUrl('/chat');
+        this.router.navigateByUrl('/home');
       })
       .catch(err => {
         console.error(err);
@@ -48,7 +48,7 @@ export class LoginComponent implements OnInit {
   loginWithTwitter(): void {
     this.authService.loginWithTwitter()
       .then(res => {
-        this.router.navigateByUrl('/chat');
+        this.router.navigateByUrl('/home');
       })
       .catch(err => {
         console.error(err);
@@ -59,7 +59,7 @@ export class LoginComponent implements OnInit {
   loginWithGoogle(): void {
     this.authService.loginWithGoogle()
       .then(res => {
-        this.router.navigateByUrl('/chat');
+        this.router.navigateByUrl('/home');
       })
       .catch(err => {
         console.error(err);
@@ -70,7 +70,7 @@ export class LoginComponent implements OnInit {
   loginWithGithub(): void {
     this.authService.loginWithGithub()
       .then(res => {
-        this.router.navigateByUrl('/chat');
+        this.router.navigateByUrl('/home');
       })
       .catch(err => {
         console.error(err);
@@ -81,7 +81,7 @@ export class LoginComponent implements OnInit {
   loginAnonymously(): void {
     this.authService.loginAnonymously()
       .then(res => {
-        this.router.navigateByUrl('/chat');
+        this.router.navigateByUrl('/home');
       })
       .catch(err => {
         console.error(err);

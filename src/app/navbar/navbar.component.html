@@ -10,10 +10,16 @@
       <a class="navbar-brand" href="#">ngx-firebase-chat</a>
     </div>
     <div class="collapse navbar-collapse" id="bs-navbar-collapse">
-      <ul class="nav navbar-nav">
-        <li><a *ngIf="isAuthenticated()" [routerLink]="['/chat']">Chat</a></li>
-        <li><a *ngIf="isAuthenticated()" [routerLink]="['/chatroom']">ChatRoom</a></li>
-        <li><a *ngIf="isAuthenticatedAsAdmin()" [routerLink]="['/admin']">Admin</a></li>
+      <ul class="nav navbar-nav" *ngIf="isAuthenticated()">
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Chat <span class="caret"></span></a>
+          <ul class="dropdown-menu dropdown-menu-inverse">
+            <li><a *ngIf="isAuthenticated()" [routerLink]="['/chatbox']">ChatBox</a></li>
+            <li><a *ngIf="isAuthenticated()" [routerLink]="['/chatroom']">ChatRoom</a></li>
+            <li role="separator" class="divider"></li>
+            <li *ngIf="isAuthenticatedAsAdmin()"><a [routerLink]="['/chatadmin']">ChatAdmin</a></li>
+          </ul>
+        </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li *ngIf="!isAuthenticated()"><a [routerLink]="['/register']">Register</a></li>

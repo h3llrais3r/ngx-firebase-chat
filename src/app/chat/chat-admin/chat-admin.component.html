@@ -1,0 +1,22 @@
+<h1 class="text-center">Chat Admin</h1>
+<hr>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-4">
+      <h1 class="text-center">Chat rooms</h1>
+      <hr>
+      <ul class="list-group">
+        <li class="list-group-item" [ngClass]="{'chat-room-active' : isChatRoomSelected(chatRoomGuid)}" *ngFor="let chatRoomGuid of chatRoomGuids">
+          <a (click)="showChatRoom(chatRoomGuid)">{{chatRoomGuid}}</a>
+        </li>
+      </ul>
+    </div>
+    <div class="col-md-8">
+      <h1 class="text-center">Chat</h1>
+      <hr>
+      <div class="col-md-8 col-md-offset-2">
+        <app-chat *ngIf="chatRoom" [chatRoom]="chatRoom"></app-chat>
+      </div>
+    </div>
+  </div>
+</div>

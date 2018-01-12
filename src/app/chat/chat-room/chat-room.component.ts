@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
-import { ChatService } from './chat.service';
-import { ChatRoom } from './chat-room';
+import { ChatRoom } from '../chat';
+import { ChatService } from '../chat.service';
 
 @Component({
   selector: 'app-chat-room',

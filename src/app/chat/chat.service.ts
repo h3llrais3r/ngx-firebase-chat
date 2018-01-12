@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFireDatabase, AngularFireList, AngularFireObject } from 'angularfire2/database';
 
-import { Chat } from './chat';
-import { ChatRoom } from './chat-room';
+import { Chat, ChatRoom } from './chat';
 import { Guid } from '../shared/util/guid';
 
 @Injectable()
@@ -18,7 +17,7 @@ export class ChatService {
     return chatRoom;
   }
 
-  getChatRooms(): any {
+  getChatRooms(): AngularFireList<string> {
     // We keep a list of chatroom guids to prevent the loading of all chatrooms
     return this.db.list('/chatrooms/list');
   }
@@ -28,18 +27,18 @@ export class ChatService {
       console.log('Getting chats from chatroom ' + chatRoom.guid + '...');
       return this.db.list('/chatrooms/' + chatRoom.guid);
     } else {
-      console.log('Getting chats...')
-      return this.db.list('/chats');
+      console.log('Getting chats from chatbox...')
+      return this.db.list('/chatbox');
     }
   }
 
   submitChat(chat: Chat, chatRoom: ChatRoom = null): void {
     if (chatRoom) {
-      console.log('Submitting to chatroom ' + chatRoom.guid + '...');
+      console.log('Submitting chat to chatroom ' + chatRoom.guid + '...');
       this.db.list('/chatrooms/' + chatRoom.guid).push(chat);
     } else {
-      console.log('Submitting to chats...')
-      this.db.list('/chats').push(chat);
+      console.log('Submitting chat to chatbox...')
+      this.db.list('/chatbox').push(chat);
     }
   }
 

@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import * as firebase from '@firebase/app';
+
+import { AuthService } from '../auth/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -7,9 +10,16 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HomeComponent implements OnInit {
 
-  constructor() { }
+  currentUser: firebase.User = null;
 
-  ngOnInit() {
+  constructor(private authService: AuthService) { }
+
+  ngOnInit() { 
+    this.authService.getAuthState().subscribe(user => this.currentUser = user);
+   }
+
+  isAuthenticated(): boolean {
+    return this.currentUser;
   }
 
 }

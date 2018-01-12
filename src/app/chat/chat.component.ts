@@ -1,9 +1,8 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, SimpleChanges, SimpleChange } from '@angular/core';
 import { EmojiService } from 'ng-emoji-picker';
 import { PushNotificationsService } from 'ng-push';
 
-import { Chat } from './chat';
-import { ChatRoom } from './chat-room';
+import { Chat, ChatRoom } from './chat';
 import { ChatService } from './chat.service';
 import { AuthService } from '../auth/auth.service';
 
@@ -14,7 +13,7 @@ declare var $; // declare jquery
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.css']
 })
-export class ChatComponent implements OnInit {
+export class ChatComponent implements OnInit, OnChanges {
 
   @Input()
   chatRoom: ChatRoom;
@@ -34,15 +33,20 @@ export class ChatComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.chatService.getChats(this.chatRoom).valueChanges()
-      .subscribe(chats => {
-        this.chats = chats.reverse();
-        // Don't show notification for my own chats
-        if (this.notifyNewChats && this.chats[0].user !== this.getChatUser()) {
-          this.pushNotificationsService.create('New chat available').subscribe();
-        }
-      });
+    $('#notifyNewChats').bootstrapToggle();
+    this.loadChats(this.chatRoom);
     this.authService.getAuthState().subscribe(user => this.currentUser = user);
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // Only handle changes for chatRoom (for now only chatRoom is monitored)
+    let chatRoomChanges: SimpleChange = changes.chatRoom;
+    if (chatRoomChanges) {
+      // Only reload when currentValue != previousValue (on firstChange previousValue is undefined so skip that also)
+      if (!chatRoomChanges.firstChange && chatRoomChanges.currentValue !== chatRoomChanges.previousValue) {
+        this.loadChats(this.chatRoom);
+      }
+    }
   }
 
   setPopupAction(fn: any): void {
@@ -53,7 +57,6 @@ export class ChatComponent implements OnInit {
     // Focus on our own message input element
     // This is needed until https://github.com/lbertenasco/ng-emoji-picker/issues/12 is fixed
     // Then we can style the emoji-input input element by using a class
-    console.log('focus');
     $('#message').focus();
   }
 
@@ -68,15 +71,24 @@ export class ChatComponent implements OnInit {
     // Only submit real message (don't submit empty ones)
     if (this.message) {
       let chat = new Chat(this.getChatUser(), new Date(), this.message);
-      console.log('Submitting chat message');
-      console.log(chat);
       this.chatService.submitChat(chat, this.chatRoom);
-      this.message = '';
+      this.message = ''; // Clear message after submit
     }
   }
 
   isMyChat(chat: Chat): boolean {
     return this.getChatUser() === chat.user;
+  }
+
+  private loadChats(chatRoom: ChatRoom): void {
+    this.chatService.getChats(this.chatRoom).valueChanges()
+      .subscribe(chats => {
+        this.chats = chats.reverse();
+        // Don't show notification for my own chats
+        if (this.notifyNewChats && this.chats[0].user !== this.getChatUser()) {
+          this.pushNotificationsService.create('New chat available').subscribe();
+        }
+      });
   }
 
   private getChatUser(): string {

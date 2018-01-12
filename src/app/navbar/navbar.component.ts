@@ -19,14 +19,12 @@ export class NavbarComponent implements OnInit {
   ngOnInit(): void {
     this.authService.getAuthState().subscribe(user => {
       if (user) {
-        console.log('User authenticated');
         this.currentUser = user;
         this.displayName = user.displayName ? user.displayName : user.email ? user.email : user.uid;
         if (this.currentUser.isAnonymous) {
           this.displayName = 'Anonymous';
         }
       } else {
-        console.log('No user authenticated');
         this.currentUser = null;
         this.displayName = null;
       }
