@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, OnChanges, SimpleChanges, SimpleChange } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Input, OnChanges, SimpleChanges, SimpleChange } from '@angular/core';
 import { EmojiService } from 'ng-emoji-picker';
 import { PushNotificationsService } from 'ng-push';
 
@@ -13,7 +13,7 @@ declare var $; // declare jquery
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.css']
 })
-export class ChatComponent implements OnInit, OnChanges {
+export class ChatComponent implements OnInit, AfterViewInit, OnChanges {
 
   @Input()
   chatRoom: ChatRoom;
@@ -33,9 +33,15 @@ export class ChatComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
-    $('#notifyNewChats').bootstrapToggle();
     this.loadChats(this.chatRoom);
     this.authService.getAuthState().subscribe(user => this.currentUser = user);
+  }
+
+  ngAfterViewInit(): void {
+    $('#notifyNewChats').bootstrapToggle();
+    $('#notifyNewChats').change((event) => {
+      this.notifyNewChats = event.target.checked;
+    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
