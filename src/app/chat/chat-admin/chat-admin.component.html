@@ -6,8 +6,8 @@
       <h1 class="text-center">Chat rooms</h1>
       <hr>
       <ul class="list-group">
-        <li class="list-group-item" [ngClass]="{'chat-room-active' : isChatRoomSelected(chatRoomGuid)}" *ngFor="let chatRoomGuid of chatRoomGuids">
-          <a (click)="showChatRoom(chatRoomGuid)">{{chatRoomGuid}}</a>
+        <li class="list-group-item" [ngClass]="{'chat-room-active' : isChatRoomSelected(chatRoomUuid)}" *ngFor="let chatRoomUuid of chatRoomUuids">
+          <a (click)="showChatRoom(chatRoomUuid)">{{chatRoomUuid}}</a>
         </li>
       </ul>
     </div>

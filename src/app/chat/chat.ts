@@ -1,5 +1,5 @@
+import { v4 as uuid } from 'uuid';
 import { DateTimeFormatPipe } from "../shared/pipe/date-time-format.pipe";
-import { Guid } from '../shared/util/guid';
 
 export class Chat {
   user: string;
@@ -14,9 +14,9 @@ export class Chat {
 }
 
 export class ChatRoom {
-  guid: Guid;
+  uuid: uuid;
 
-  constructor(guid: Guid) {
-    this.guid = guid;
+  constructor(uuid: uuid) {
+    this.uuid = uuid;
   }
 }
