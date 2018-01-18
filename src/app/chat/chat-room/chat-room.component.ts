@@ -14,7 +14,7 @@ export class ChatRoomComponent implements OnInit {
 
   constructor(private chatService: ChatService) {
     this.chatRoom = this.chatService.createChatRoom();
-    console.log('Created chatroom ' + this.chatRoom.guid);
+    console.log('Created chatroom ' + this.chatRoom.uuid);
   }
 
   ngOnInit(): void { }

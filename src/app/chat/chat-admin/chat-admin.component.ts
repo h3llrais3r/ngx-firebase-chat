@@ -10,24 +10,24 @@ import { ChatService } from '../chat.service';
 })
 export class ChatAdminComponent implements OnInit {
 
-  chatRoomGuids: string[];
+  chatRoomUuids: string[];
   chatRoom: ChatRoom;
 
   constructor(private chatService: ChatService) { }
 
   ngOnInit() {
     this.chatService.getChatRooms().valueChanges()
-      .subscribe(chatRoomGuids => {
-        this.chatRoomGuids = chatRoomGuids;
+      .subscribe(chatRoomUuids => {
+        this.chatRoomUuids = chatRoomUuids;
       });
   }
 
-  isChatRoomSelected(chatRoomGuid: string): boolean {
-    return this.chatRoom && this.chatRoom.guid === chatRoomGuid;
+  isChatRoomSelected(chatRoomUuid: string): boolean {
+    return this.chatRoom && this.chatRoom.uuid === chatRoomUuid;
   }
 
-  showChatRoom(chatRoomGuid:string): void {
-    this.chatRoom = new ChatRoom(chatRoomGuid);
+  showChatRoom(chatRoomUuid:string): void {
+    this.chatRoom = new ChatRoom(chatRoomUuid);
   }
 
 }
