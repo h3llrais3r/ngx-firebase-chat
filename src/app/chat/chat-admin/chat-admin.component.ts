@@ -20,7 +20,7 @@ export class ChatAdminComponent implements OnInit {
     this.chatService.getChatRooms(true).valueChanges()
       .subscribe(chatRooms => {
         this.chatRooms = chatRooms;
-        if (this.chatRoom && !this.chatRooms.includes(this.chatRoom)) {
+        if (this.chatRoom && !this.chatRooms.find(chatRoom => chatRoom.uuid === this.chatRoom.uuid)) {
           // Remove current chatroom when it's disconnected
           console.log('Chatroom ' + this.chatRoom.uuid + ' no longer active');
           this.chatRoom = null;
@@ -29,7 +29,7 @@ export class ChatAdminComponent implements OnInit {
   }
 
   isChatRoomSelected(chatRoom: ChatRoom): boolean {
-    return this.chatRoom && this.chatRoom == chatRoom;
+    return this.chatRoom && this.chatRoom.uuid === chatRoom.uuid;
   }
 
   showChatRoom(chatRoom: ChatRoom): void {
