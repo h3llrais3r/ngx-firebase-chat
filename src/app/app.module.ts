@@ -7,6 +7,7 @@ import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import { EmojiPickerModule } from 'ng-emoji-picker';
 import { PushNotificationsModule } from 'ng-push';
+import { Ng2Webstorage } from 'ngx-webstorage';
 
 import { AppRoutingModule } from './app-routing.module';
 import { SharedModule } from './shared/shared.module';
@@ -23,6 +24,7 @@ import { ChatRoomComponent } from './chat/chat-room/chat-room.component';
 import { ChatAdminComponent } from './chat/chat-admin/chat-admin.component';
 import { AuthService } from './auth/auth.service';
 import { ChatService } from './chat/chat.service';
+import { StoreService } from './store/store.service';
 
 @NgModule({
   declarations: [
@@ -45,12 +47,14 @@ import { ChatService } from './chat/chat.service';
     AngularFireAuthModule,
     EmojiPickerModule,
     PushNotificationsModule,
+    Ng2Webstorage,
     AppRoutingModule,
     SharedModule
   ],
   providers: [
     AuthService,
-    ChatService
+    ChatService,
+    StoreService
   ],
   bootstrap: [AppComponent]
 })

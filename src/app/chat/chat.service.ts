@@ -1,15 +1,38 @@
 import { Injectable } from '@angular/core';
-import { v4 as uuid } from 'uuid';
 import { AngularFireDatabase, AngularFireList, AngularFireObject } from 'angularfire2/database';
 
 import { Chat, ChatRoom } from './chat';
+import { StoreService } from '../store/store.service';
 
 @Injectable()
 export class ChatService {
 
-  constructor(private db: AngularFireDatabase) { }
+  constructor(private db: AngularFireDatabase, private storeService: StoreService) { }
 
-  createChatRoom(): ChatRoom {
+  getChatRoom(): ChatRoom {
+    let uuid = this.storeService.chatRoomUuid;
+    if (uuid) {
+      console.log('Activating chatroom: ' + uuid);
+      return this.activateChatRoom(uuid);
+    } else {
+      let chatRoom = this.createChatRoom();
+      this.storeService.chatRoomUuid = chatRoom.uuid;
+      console.log('Creating chatroom: ' + chatRoom.uuid);
+      return chatRoom;
+    }
+  }
+
+  private activateChatRoom(uuid: string): ChatRoom {
+    // Ativate chatroom
+    let chatRoomReference = this.db.database.ref('/chatrooms/list/' + uuid);
+    let chatRoom = new ChatRoom(uuid);
+    chatRoomReference.update(chatRoom);
+    // Handle disconnect of chatroom
+    chatRoomReference.onDisconnect().update({ active: false });
+    return chatRoom;
+  }
+
+  private createChatRoom(): ChatRoom {
     // Create chatroom (we use the key from firebase as uuid of the chat)
     let chatRoomReference = this.db.database.ref('/chatrooms/list').push();
     let uuid = chatRoomReference.key;
