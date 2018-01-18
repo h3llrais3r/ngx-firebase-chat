@@ -10,16 +10,25 @@ export class ChatService {
   constructor(private db: AngularFireDatabase) { }
 
   createChatRoom(): ChatRoom {
-    // Create chatroom and push welcome chat
-    let chatRoom = new ChatRoom(uuid());
-    this.db.list('/chatrooms/list').push(chatRoom.uuid);
-    this.db.list('/chatrooms/' + chatRoom.uuid).push(new Chat('', new Date(), 'Welcome to chatroom ' + chatRoom.uuid));
+    // Create chatroom (we use the key from firebase as uuid of the chat)
+    let chatRoomReference = this.db.database.ref('/chatrooms/list').push();
+    let uuid = chatRoomReference.key;
+    let chatRoom = new ChatRoom(uuid);
+    chatRoomReference.set(chatRoom);
+    // Handle disconnect of chatroom
+    chatRoomReference.onDisconnect().update({ active: false });
+    // Push welcome message
+    this.db.database.ref('/chatrooms/' + uuid).push(new Chat('', new Date(), 'Welcome to chatroom ' + uuid));
     return chatRoom;
   }
 
-  getChatRooms(): AngularFireList<string> {
+  getChatRooms(active: boolean = false): AngularFireList<ChatRoom> {
     // We keep a list of chatroom uuids to prevent the loading of all chatrooms
-    return this.db.list('/chatrooms/list');
+    if (active) {
+      return this.db.list('/chatrooms/list', ref => ref.orderByChild('active').equalTo(true));
+    } else {
+      return this.db.list('/chatrooms/list');
+    }
   }
 
   getChats(chatRoom: ChatRoom = null): AngularFireList<Chat> {

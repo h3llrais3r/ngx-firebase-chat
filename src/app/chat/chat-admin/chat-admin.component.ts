@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { ChatRoom } from '../chat';
+import { ChatRoom, Chat } from '../chat';
 import { ChatService } from '../chat.service';
 
 @Component({
@@ -10,24 +10,30 @@ import { ChatService } from '../chat.service';
 })
 export class ChatAdminComponent implements OnInit {
 
-  chatRoomUuids: string[];
+  chatRooms: ChatRoom[];
   chatRoom: ChatRoom;
 
   constructor(private chatService: ChatService) { }
 
   ngOnInit() {
-    this.chatService.getChatRooms().valueChanges()
-      .subscribe(chatRoomUuids => {
-        this.chatRoomUuids = chatRoomUuids;
+    // Only get active chatrooms
+    this.chatService.getChatRooms(true).valueChanges()
+      .subscribe(chatRooms => {
+        this.chatRooms = chatRooms;
+        if (this.chatRoom && !this.chatRooms.includes(this.chatRoom)) {
+          // Remove current chatroom when it's disconnected
+          console.log('Chatroom ' + this.chatRoom.uuid + ' no longer active');
+          this.chatRoom = null;
+        }
       });
   }
 
-  isChatRoomSelected(chatRoomUuid: string): boolean {
-    return this.chatRoom && this.chatRoom.uuid === chatRoomUuid;
+  isChatRoomSelected(chatRoom: ChatRoom): boolean {
+    return this.chatRoom && this.chatRoom == chatRoom;
   }
 
-  showChatRoom(chatRoomUuid:string): void {
-    this.chatRoom = new ChatRoom(chatRoomUuid);
+  showChatRoom(chatRoom: ChatRoom): void {
+    this.chatRoom = chatRoom;
   }
 
 }

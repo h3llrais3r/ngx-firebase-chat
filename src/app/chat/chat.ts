@@ -15,8 +15,10 @@ export class Chat {
 
 export class ChatRoom {
   uuid: uuid;
+  active: boolean;
 
   constructor(uuid: uuid) {
     this.uuid = uuid;
+    this.active = true;
   }
 }
