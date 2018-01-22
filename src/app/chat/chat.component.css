@@ -28,10 +28,3 @@
   background-color: #eee;
   background-size: 24px;
 }
-
-
-/*Use ::ng-deep until https://github.com/lbertenasco/ng-emoji-picker/issues/12 is fixed */
-
-::ng-deep .emoji-input input {
-  display: none;
-}

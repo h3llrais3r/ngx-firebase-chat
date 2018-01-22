@@ -1,1 +1,12 @@
 /* You can add global styles to this file, and also import other style files */
+
+
+/*
+Alignment for emoji-search class in combination with bootstrap
+Needs to be global in order to work (style applied when put in chat.component.css)
+*/
+
+.emoji-search-bootstrap {
+  /*This is the bootstrap form-control height*/
+  margin-top: 34px;
+}

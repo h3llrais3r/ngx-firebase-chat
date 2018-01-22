@@ -59,18 +59,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnChanges {
     this.openPopup = fn;
   }
 
-  focus(): void {
-    // Focus on our own message input element
-    // This is needed until https://github.com/lbertenasco/ng-emoji-picker/issues/12 is fixed
-    // Then we can style the emoji-input input element by using a class
-    $('#message').focus();
-  }
-
-  emojify(): void {
-    // Emojify our own message (needed because we are using our own input element)
-    // This is needed until https://github.com/lbertenasco/ng-emoji-picker/issues/12 is fixed
-    // Then we can style the emoji-input input element by using a class and we don't need our own input element anymore
-    this.message = this.emojiService.emojify(this.message);
+  onModelChange(): void {
+    console.log('model changed');
   }
 
   submitChat(event: any): void {

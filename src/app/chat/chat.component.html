@@ -3,10 +3,9 @@
     <div class="form-group">
       <label for="message">Chat message</label>
       <div class="input-group">
-        <input [(ngModel)]="message" (ngModelChange)="emojify()" (click)="openPopup(false)" (keyup.enter)="submitChat()" type="text" class="form-control" name="message" placeholder="message...">
+        <emoji-input name="message" placeholder="message..." [(model)]="message" (ngModelChange)="onModelChange()" inputClass="form-control" searchClass="emoji-search-bootstrap" (keyup.enter)="submitChat()" (click)="openPopup(false)" (setPopupAction)="setPopupAction($event)"></emoji-input>
         <div class="input-group-addon btn btn-emoji" (click)="openPopup()"></div>
       </div>
-      <emoji-input [(model)]="message" class="emoji-input" (emojiClick)="focus()" (click)="openPopup(false)" (setPopupAction)="setPopupAction($event)"></emoji-input>
     </div>
     <div class="form-group">
       <button class="btn btn-primary" (click)="submitChat()">Submit</button>
