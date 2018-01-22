@@ -13,7 +13,7 @@ export class ChatService {
   private CHATBOX_TYPING_REF = '/chatbox/typing/';
   private CHATROOMS_REF = '/chatrooms/';
   private CHATROOMS_LIST_REF = '/chatrooms/list/';
-  private CHATROOMS_LIST_CHATROOM_REF = '/chatrooms/lists/{0}/';
+  private CHATROOMS_LIST_CHATROOM_REF = '/chatrooms/list/{0}/';
   private CHATROOMS_CHATROOM_REF = '/chatrooms/{0}/';
   private CHATROOMS_CHATROOM_CHATS_REF = '/chatrooms/{0}/chats/';
   private CHATROOMS_CHATROOM_TYPING_REF = '/chatrooms/{0}/typing/';
