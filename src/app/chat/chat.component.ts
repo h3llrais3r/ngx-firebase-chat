@@ -1,8 +1,9 @@
 import { Component, OnInit, AfterViewInit, Input, OnChanges, SimpleChanges, SimpleChange } from '@angular/core';
 import { EmojiService } from 'ng-emoji-picker';
 import { PushNotificationsService } from 'ng-push';
+import * as firebase from 'firebase/app';
 
-import { Chat, ChatRoom } from './chat';
+import { Chat, ChatRoom, ChatUser } from './chat';
 import { ChatService } from './chat.service';
 import { AuthService } from '../auth/auth.service';
 
@@ -17,11 +18,19 @@ export class ChatComponent implements OnInit, AfterViewInit, OnChanges {
 
   @Input()
   chatRoom: ChatRoom;
+  chatRoomRef: firebase.database.Reference;
 
-  currentUser: any;
+  chatUser: ChatUser;
+  chatUserRef: firebase.database.Reference;
+
   chats: any[];
-  message: string = '';
+  chatUsers: ChatUser[];
+  chatUsersTyping: string[];
+  chatUsersTypingMessage: string;
+
   notifyNewChats: boolean = false;
+
+  message: string = '';
 
   openPopup: Function;
 
@@ -33,8 +42,11 @@ export class ChatComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   ngOnInit(): void {
-    this.loadChats(this.chatRoom);
-    this.authService.getAuthState().subscribe(user => this.currentUser = user);
+    this.authService.getAuthState().subscribe(user => {
+      this.chatUser = this.getChatUser(user);
+      this.chatUserRef = this.chatService.registerUser(this.chatUser, this.chatRoom);
+    });
+    this.loadChatComponent(this.chatRoom);
   }
 
   ngAfterViewInit(): void {
@@ -50,7 +62,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnChanges {
     if (chatRoomChanges) {
       // Only reload when currentValue != previousValue (on firstChange previousValue is undefined so skip that also)
       if (!chatRoomChanges.firstChange && chatRoomChanges.currentValue !== chatRoomChanges.previousValue) {
-        this.loadChats(this.chatRoom);
+        this.loadChatComponent(this.chatRoom);
       }
     }
   }
@@ -59,21 +71,30 @@ export class ChatComponent implements OnInit, AfterViewInit, OnChanges {
     this.openPopup = fn;
   }
 
-  onModelChange(): void {
-    console.log('model changed');
+  isTyping(): void {
+    if (this.message) {
+      this.chatService.setChatUserIsTyping(this.chatUserRef, true);
+    } else {
+      this.chatService.setChatUserIsTyping(this.chatUserRef, false);
+    }
   }
 
   submitChat(event: any): void {
     // Only submit real message (don't submit empty ones)
     if (this.message) {
-      let chat = new Chat(this.getChatUser(), new Date(), this.message);
-      this.chatService.submitChat(chat, this.chatRoom);
+      let chat = new Chat(this.chatUser, new Date(), this.message);
+      this.chatService.submitChat(chat, this.chatUserRef, this.chatRoom);
       this.message = ''; // Clear message after submit
     }
   }
 
   isMyChat(chat: Chat): boolean {
-    return this.getChatUser() === chat.user;
+    return this.chatUser === chat.user;
+  }
+
+  private loadChatComponent(chatRoom: ChatRoom): void {
+    this.loadChats(chatRoom);
+    this.loadChatUsers(chatRoom);
   }
 
   private loadChats(chatRoom: ChatRoom): void {
@@ -81,14 +102,29 @@ export class ChatComponent implements OnInit, AfterViewInit, OnChanges {
       .subscribe(chats => {
         this.chats = chats.reverse();
         // Don't show notification for my own chats
-        if (this.notifyNewChats && this.chats[0].user !== this.getChatUser()) {
+        if (this.notifyNewChats && this.chats[0].user !== this.chatUser) {
           this.pushNotificationsService.create('New chat available').subscribe();
         }
       });
   }
 
-  private getChatUser(): string {
-    return this.currentUser.displayName ? this.currentUser.displayName : this.currentUser.email ? this.currentUser.email : this.currentUser.uid;
+  private loadChatUsers(chatRoom: ChatRoom): void {
+    this.chatService.getChatUsers(this.chatRoom).valueChanges()
+      .subscribe(chatUsers => {
+        this.chatUsers = chatUsers.sort((user1, user2) => user1.displayName < user2.displayName ? -1 : user1.displayName > user2.displayName ? 1 : 0);
+        // Filter which users are typing (exluding current user)
+        this.chatUsersTyping = this.chatUsers.filter(chatUser => chatUser.isTyping && chatUser.uuid !== this.chatUser.uuid).map(chatUser => chatUser.displayName);
+        if (this.chatUsersTyping && this.chatUsersTyping.length > 0) {
+          this.chatUsersTypingMessage = this.chatUsersTyping.join(',') + " is typing...";
+        } else {
+          this.chatUsersTypingMessage = null;
+        }
+      });
+  }
+
+  private getChatUser(user: firebase.User): ChatUser {
+    let displayName = user.displayName ? user.displayName : user.email ? user.email : user.uid;
+    return new ChatUser(user.uid, displayName)
   }
 
 }

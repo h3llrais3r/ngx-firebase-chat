@@ -3,7 +3,7 @@
     <div class="form-group">
       <label for="message">Chat message</label>
       <div class="input-group">
-        <emoji-input name="message" placeholder="message..." [(model)]="message" (ngModelChange)="onModelChange()" inputClass="form-control" searchClass="emoji-search-bootstrap" (keyup.enter)="submitChat()" (click)="openPopup(false)" (setPopupAction)="setPopupAction($event)"></emoji-input>
+        <emoji-input [(model)]="message" inputClass="form-control" searchClass="emoji-search-bootstrap" (keyup)="isTyping()" (keyup.enter)="submitChat()" (click)="openPopup(false)" (setPopupAction)="setPopupAction($event)"></emoji-input>
         <div class="input-group-addon btn btn-emoji" (click)="openPopup()"></div>
       </div>
     </div>
@@ -15,9 +15,12 @@
       </div>
     </div>
     <hr>
+    <div class="form-group" *ngIf="chatUsersTypingMessage">
+      <span>{{chatUsersTypingMessage}}</span>
+    </div>
     <ul class="list-group">
       <li class="list-group-item chat" [ngClass]="{'mychat': isMyChat(chat)}" *ngFor="let chat of chats">
-        <span class="chat-user">{{chat.user}} </span>
+        <span class="chat-user" *ngIf="chat.user">{{chat.user.displayName}} </span>
         <span class="chat-timestamp">({{chat.timestamp}}): </span>
         <span class="chat-message">{{chat.message}}</span>
       </li>
