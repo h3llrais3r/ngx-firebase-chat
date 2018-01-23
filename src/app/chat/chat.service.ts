@@ -9,17 +9,19 @@ import { StringFormat } from '../shared/util/string-format';
 @Injectable()
 export class ChatService {
 
-  private CHATBOX_REF = '/chatbox/';
-  private CHATBOX_USERS_REF = '/chatbox/users/';
-  private CHATBOX_USERS_USER_REF = '/chatbox/users/{0}/';
-  private CHATBOX_CHATS_REF = '/chatbox/chats/';
-  private CHATROOMS_REF = '/chatrooms/';
-  private CHATROOMS_LIST_REF = '/chatrooms/list/';
-  private CHATROOMS_LIST_CHATROOM_REF = '/chatrooms/list/{0}/';
-  private CHATROOMS_CHATROOM_REF = '/chatrooms/{0}/';
-  private CHATROOMS_CHATROOM_USERS_REF = '/chatrooms/{0}/users/';
-  private CHATROOMS_CHATROOM_USERS_USER_REF = '/chatrooms/{0}/users/{1}/';
-  private CHATROOMS_CHATROOM_CHATS_REF = '/chatrooms/{0}/chats/';
+  // Chatbox refs
+  private CHATBOX_REF = '/chatbox';
+  private CHATBOX_CHATS_REF = this.CHATBOX_REF + '/chats';
+  private CHATBOX_USERS_REF = this.CHATBOX_REF + '/users';
+  private CHATBOX_USERS_USER_REF = this.CHATBOX_USERS_REF + '/{0}';
+  // Chatrooms refs
+  private CHATROOMS_REF = '/chatrooms';
+  private CHATROOMS_LIST_REF = this.CHATROOMS_REF + '/list';
+  private CHATROOMS_LIST_CHATROOM_REF = this.CHATROOMS_LIST_REF + '/{0}';
+  private CHATROOMS_CHATROOM_REF = this.CHATROOMS_REF + '/{0}';
+  private CHATROOMS_CHATROOM_CHATS_REF = this.CHATROOMS_CHATROOM_REF + '/chats';
+  private CHATROOMS_CHATROOM_USERS_REF = this.CHATROOMS_CHATROOM_REF + '/users';
+  private CHATROOMS_CHATROOM_USERS_USER_REF = this.CHATROOMS_CHATROOM_USERS_REF + '/{1}';
 
   constructor(private db: AngularFireDatabase, private storeService: StoreService) { }
 
