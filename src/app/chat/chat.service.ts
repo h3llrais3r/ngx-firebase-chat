@@ -101,15 +101,19 @@ export class ChatService {
           userRef.set(chatUser);
         }
       });
+      // Remove user on disconnect
+      userRef.onDisconnect().remove();
       return userRef;
     } else {
       // Register user in chatbox if not already done
       let userRef = this.db.database.ref(StringFormat.format(this.CHATBOX_USERS_USER_REF, chatUser.uuid));
       userRef.once('value', res => {
         if (!res.exists()) {
-          return userRef.set(chatUser);
+          userRef.set(chatUser);
         }
       });
+      // Remove user on disconnect
+      userRef.onDisconnect().remove();
       return userRef;
     }
   }
