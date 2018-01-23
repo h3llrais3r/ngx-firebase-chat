@@ -54,8 +54,6 @@ export class ChatService {
     let uuid = chatRoomReference.key;
     let chatRoom = new ChatRoom(uuid);
     chatRoomReference.set(chatRoom);
-    // Handle disconnect of chatroom
-    chatRoomReference.onDisconnect().update({ active: false });
     // Push welcome message
     this.db.database.ref(StringFormat.format(this.CHATROOMS_CHATROOM_CHATS_REF, uuid)).push(new Chat(null, new Date(), 'Welcome to chatroom ' + uuid));
     return chatRoom;
@@ -103,6 +101,9 @@ export class ChatService {
       });
       // Remove user on disconnect
       userRef.onDisconnect().remove();
+      // TODO: chatRoom should become inactive when no more users are connected
+      // Handle disconnect of chatroom
+      // chatRoomReference.onDisconnect().update({ active: false });
       return userRef;
     } else {
       // Register user in chatbox if not already done
@@ -114,6 +115,9 @@ export class ChatService {
       });
       // Remove user on disconnect
       userRef.onDisconnect().remove();
+      // TODO: chatRoom should become inactive when no more users are connected
+      // Handle disconnect of chatroom
+      // chatRoomReference.onDisconnect().update({ active: false });
       return userRef;
     }
   }
