@@ -1,0 +1,12 @@
+.chat-room-joined {
+    background-color: #337ab7;
+    font-weight: bold;
+}
+
+.chat-room-joined a {
+    color: #ffffff;
+}
+
+li a {
+    cursor: pointer;
+}

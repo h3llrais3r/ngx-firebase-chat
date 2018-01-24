@@ -44,9 +44,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnChanges {
   ngOnInit(): void {
     this.authService.getAuthState().subscribe(user => {
       this.chatUser = this.getChatUser(user);
-      this.chatUserRef = this.chatService.registerUser(this.chatUser, this.chatRoom);
+      this.loadChatComponent(this.chatRoom);
     });
-    this.loadChatComponent(this.chatRoom);
   }
 
   ngAfterViewInit(): void {
@@ -58,10 +57,11 @@ export class ChatComponent implements OnInit, AfterViewInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     // Only handle changes for chatRoom (for now only chatRoom is monitored)
-    let chatRoomChanges: SimpleChange = changes.chatRoom;
-    if (chatRoomChanges) {
+    let chatRoomChange: SimpleChange = changes.chatRoom;
+    if (chatRoomChange) {
       // Only reload when currentValue != previousValue (on firstChange previousValue is undefined so skip that also)
-      if (!chatRoomChanges.firstChange && chatRoomChanges.currentValue !== chatRoomChanges.previousValue) {
+      if (!chatRoomChange.firstChange && chatRoomChange.currentValue !== chatRoomChange.previousValue) {
+        console.log('Chatroom changed to ' + this.chatRoom);
         this.loadChatComponent(this.chatRoom);
       }
     }
@@ -93,6 +93,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   private loadChatComponent(chatRoom: ChatRoom): void {
+    this.chatUserRef = this.chatService.registerUser(this.chatUser, this.chatRoom);
     this.loadChats(chatRoom);
     this.loadChatUsers(chatRoom);
   }

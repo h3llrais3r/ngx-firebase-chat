@@ -1,5 +1,25 @@
-<h1 class="text-center">Chat Room {{chatRoom.uuid}}</h1>
+<h1 class="text-center">Chat Room</h1>
 <hr>
-<div class="col-lg-6 col-lg-offset-3 col-md-6 col-md-offset-3 col-sm-10 col-sm-offset-1 col-xs-12">
-  <app-chat [chatRoom]="chatRoom"></app-chat>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-4">
+      <h1 class="text-center">Join chat room</h1>
+      <hr>
+      <ul class="list-group">
+        <li class="list-group-item">
+          <a (click)="createChatRoom()" class="btn btn-primary">New chat room</a>
+        </li>
+        <li class="list-group-item" [ngClass]="{'chat-room-joined' : isChatRoomJoined(chatRoom)}" *ngFor="let chatRoom of chatRooms">
+          <a (click)="joinChatRoom(chatRoom)">{{chatRoom.uuid}}</a>
+        </li>
+      </ul>
+    </div>
+    <div class="col-md-8">
+      <h1 class="text-center">Chat</h1>
+      <hr>
+      <div class="col-md-8 col-md-offset-2">
+        <app-chat *ngIf="chatRoom" [(chatRoom)]="chatRoom"></app-chat>
+      </div>
+    </div>
+  </div>
 </div>
