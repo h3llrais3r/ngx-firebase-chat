@@ -7,10 +7,16 @@
       <hr>
       <ul class="list-group">
         <li class="list-group-item">
-          <a (click)="createChatRoom()" class="btn btn-primary">New chat room</a>
+          <div class="input-group">
+            <span class="input-group-addon">#</span>
+            <input type="text" [(ngModel)]="newChatRoomName" class="form-control" placeholder="ChatRoom name">
+            <span class="input-group-btn">
+              <button (click)="createChatRoom()" class="btn btn-primary">New chat room</button>
+            </span>
+          </div>
         </li>
         <li class="list-group-item" [ngClass]="{'chat-room-joined' : isChatRoomJoined(chatRoom)}" *ngFor="let chatRoom of chatRooms">
-          <a (click)="joinChatRoom(chatRoom)">{{chatRoom.uuid}}</a>
+          <a (click)="joinChatRoom(chatRoom)">{{getChatRoomDisplayName(chatRoom)}}</a>
         </li>
       </ul>
     </div>

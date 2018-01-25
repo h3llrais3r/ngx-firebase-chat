@@ -1,4 +1,5 @@
 .chat-room-joined {
+    /* Bootstrap bg-primary color */
     background-color: #337ab7;
     font-weight: bold;
 }

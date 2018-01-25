@@ -26,10 +26,13 @@ export class ChatUser {
 
 export class ChatRoom {
   uuid: string;
+  displayName: string;
   active: boolean;
 
-  constructor(uuid: string) {
+  // In case the displayName is empty, we consider it a private chatroom
+  constructor(uuid: string, displayName: string = null) {
     this.uuid = uuid;
+    this.displayName = displayName;
     this.active = true;
   }
 }

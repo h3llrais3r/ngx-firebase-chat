@@ -25,38 +25,58 @@ export class ChatService {
 
   constructor(private db: AngularFireDatabase, private storeService: StoreService) { }
 
-  getChatRoom(): ChatRoom {
-    let uuid = this.storeService.chatRoomUuid;
-    if (uuid) {
-      console.log('Activating chatroom: ' + uuid);
-      return this.activateChatRoom(uuid);
-    } else {
-      let chatRoom = this.createChatRoom();
-      this.storeService.chatRoomUuid = chatRoom.uuid;
-      console.log('Creating chatroom: ' + chatRoom.uuid);
-      return chatRoom;
-    }
+  getChatRoom(chatRoomName: string): Promise<ChatRoom> {
+    return this.db.database.ref(this.CHATROOMS_LIST_REF).orderByChild('displayName').equalTo(chatRoomName)
+      .once('value')
+      .then(snapshot => {
+        if (snapshot.exists()) {
+          console.debug('Chatroom ' + chatRoomName + ' found');
+          // Retrieve chatroom
+          let uuid = Object.keys(snapshot.val())[0]; // uuid is the key under which the chatroom has been stored!
+          return this.db.database.ref(StringFormat.format(this.CHATROOMS_LIST_CHATROOM_REF, uuid))
+            .once('value')
+            .then(snapshot => {
+              return <ChatRoom>snapshot.val();
+            });
+        } else {
+          console.debug('Chatroom ' + chatRoomName + ' not found');
+          return null;
+        }
+      });
   }
 
-  private activateChatRoom(uuid: string): ChatRoom {
-    // Ativate chatroom
-    let chatRoomReference = this.db.database.ref(StringFormat.format(this.CHATROOMS_LIST_CHATROOM_REF, uuid));
-    let chatRoom = new ChatRoom(uuid);
-    chatRoomReference.update(chatRoom);
-    // Handle disconnect of chatroom
-    chatRoomReference.onDisconnect().update({ active: false });
-    return chatRoom;
-  }
-
-  private createChatRoom(): ChatRoom {
+  createChatRoom(displayName: string = null): Promise<ChatRoom> {
     // Create chatroom (we use the key from firebase as uuid of the chat)
     let chatRoomReference = this.db.database.ref(this.CHATROOMS_LIST_REF).push();
     let uuid = chatRoomReference.key;
-    let chatRoom = new ChatRoom(uuid);
-    chatRoomReference.set(chatRoom);
-    // Push welcome message
-    this.db.database.ref(StringFormat.format(this.CHATROOMS_CHATROOM_CHATS_REF, uuid)).push(new Chat(null, new Date(), 'Welcome to chatroom ' + uuid));
-    return chatRoom;
+    let chatRoom = new ChatRoom(uuid, displayName);
+    return chatRoomReference.set(chatRoom)
+      .then(() => {
+        console.debug('Chatroom ' + this.getChatRoomDisplayName(chatRoom) + ' created');
+        // Push welcome message
+        this.db.database.ref(StringFormat.format(this.CHATROOMS_CHATROOM_CHATS_REF, uuid))
+          .push(new Chat(null, new Date(), 'Welcome to chatroom ' + this.getChatRoomDisplayName(chatRoom)));
+        // return created chatroom
+        return chatRoom;
+      });
+  }
+
+  activateChatRoom(uuid: string): Promise<ChatRoom> {
+    // Ativate chatroom
+    let chatRoomReference = this.db.database.ref(StringFormat.format(this.CHATROOMS_LIST_CHATROOM_REF, uuid));
+    return chatRoomReference
+      .update({ active: true })
+      .then(() => {
+        return chatRoomReference
+          .once('value')
+          .then(snapshot => {
+            let chatRoom = <ChatRoom>snapshot.val();
+            console.debug('Activating chatroom ' + this.getChatRoomDisplayName(chatRoom))
+            return chatRoom;
+          });
+      });
+    // Handle disconnect of chatroom
+    //chatRoomReference.onDisconnect().update({ active: false });
   }
 
   getChatRooms(active: boolean = false): AngularFireList<ChatRoom> {
@@ -70,21 +90,21 @@ export class ChatService {
 
   getChats(chatRoom: ChatRoom = null): AngularFireList<Chat> {
     if (chatRoom) {
-      console.log('Getting chats from chatroom ' + chatRoom.uuid + '...');
+      console.debug('Getting chats from chatroom ' + chatRoom.uuid + '...');
       return this.db.list(StringFormat.format(this.CHATROOMS_CHATROOM_CHATS_REF, chatRoom.uuid));
     } else {
-      console.log('Getting chats from chatbox...')
+      console.debug('Getting chats from chatbox...')
       return this.db.list(this.CHATBOX_CHATS_REF);
     }
   }
 
   submitChat(chat: Chat, chatUserRef: firebase.database.Reference, chatRoom: ChatRoom = null): void {
     if (chatRoom) {
-      console.log('Submitting chat to chatroom ' + chatRoom.uuid + '...');
+      console.debug('Submitting chat to chatroom ' + chatRoom.uuid + '...');
       this.db.list(StringFormat.format(this.CHATROOMS_CHATROOM_CHATS_REF, chatRoom.uuid)).push(chat);
       this.setChatUserIsTyping(chatUserRef, false);
     } else {
-      console.log('Submitting chat to chatbox...')
+      console.debug('Submitting chat to chatbox...')
       this.db.list(this.CHATBOX_CHATS_REF).push(chat);
       this.setChatUserIsTyping(chatUserRef, false);
     }
@@ -128,12 +148,16 @@ export class ChatService {
 
   getChatUsers(chatRoom: ChatRoom = null): AngularFireList<ChatUser> {
     if (chatRoom) {
-      console.log('Getting chat users in chatroom ' + chatRoom.uuid + '...');
+      console.debug('Getting chat users in chatroom ' + chatRoom.uuid + '...');
       return this.db.list(StringFormat.format(this.CHATROOMS_CHATROOM_USERS_REF, chatRoom.uuid));
     } else {
-      console.log('Getting chat users in chatbox...')
+      console.debug('Getting chat users in chatbox...')
       return this.db.list(this.CHATBOX_USERS_REF);
     }
+  }
+
+  private getChatRoomDisplayName(chatRoom: ChatRoom): string {
+    return chatRoom ? chatRoom.displayName ? chatRoom.displayName : chatRoom.uuid : '';
   }
 
 }
