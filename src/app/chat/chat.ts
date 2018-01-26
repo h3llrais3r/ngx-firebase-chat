@@ -14,25 +14,39 @@ export class Chat {
 
 export class ChatUser {
   uuid: string; // references to the firebase.User identifier
-  displayName: string;
+  name: string;
   isTyping: boolean = false;
 
-  constructor(uuid: string, displayName: string) {
+  constructor(uuid: string, name: string) {
     this.uuid = uuid;
-    this.displayName = displayName;
+    this.name = name;
     this.isTyping = false;
+  }
+
+  get displayName(): string {
+    return this.name ? this.name : this.uuid;
   }
 }
 
 export class ChatRoom {
   uuid: string;
-  displayName: string;
+  name: string;
   active: boolean;
 
-  // In case the displayName is empty, we consider it a private chatroom
-  constructor(uuid: string, displayName: string = null) {
+  // In case the name is empty, we consider it a private chatroom
+  constructor(uuid: string, name: string = null, active: boolean = true) {
     this.uuid = uuid;
-    this.displayName = displayName;
-    this.active = true;
+    this.name = name;
+    this.active = active;
   }
+
+  get displayName(): string {
+    return this.name ? this.name : this.uuid;
+  }
+
+  // Helper method to construct the ChatRoom object from a json object (with same object interface)
+  static fromData(chatRoomData: ChatRoom) {
+    return new ChatRoom(chatRoomData.uuid, chatRoomData.name, chatRoomData.active);
+  }
+
 }

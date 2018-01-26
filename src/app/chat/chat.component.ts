@@ -124,8 +124,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   private getChatUser(user: firebase.User): ChatUser {
-    let displayName = user.displayName ? user.displayName : user.email ? user.email : user.uid;
-    return new ChatUser(user.uid, displayName)
+    let name = user.displayName ? user.displayName : user.email ? user.email : null;
+    return new ChatUser(user.uid, name);
   }
 
 }

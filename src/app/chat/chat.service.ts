@@ -76,10 +76,10 @@ export class ChatService {
     let chatRoom = new ChatRoom(uuid, displayName);
     return chatRoomReference.set(chatRoom)
       .then(() => {
-        console.debug('Chatroom ' + this.getChatRoomDisplayName(chatRoom) + ' created');
+        console.debug('Chatroom ' + chatRoom.displayName + ' created');
         // Push welcome message
         this.db.database.ref(StringFormat.format(this.CHATROOMS_CHATROOM_CHATS_REF, uuid))
-          .push(new Chat(null, new Date(), 'Welcome to chatroom ' + this.getChatRoomDisplayName(chatRoom)));
+          .push(new Chat(null, new Date(), 'Welcome to chatroom ' + chatRoom.displayName));
         // return created chatroom
         return chatRoom;
       });
@@ -95,7 +95,7 @@ export class ChatService {
           .once('value')
           .then(snapshot => {
             let chatRoom = <ChatRoom>snapshot.val();
-            console.debug('Activating chatroom ' + this.getChatRoomDisplayName(chatRoom))
+            console.debug('Activating chatroom ' + chatRoom.displayName);
             return chatRoom;
           });
       });
@@ -173,10 +173,6 @@ export class ChatService {
       console.debug('Getting chat users in chatbox...')
       return this.db.list(this.CHATBOX_USERS_REF);
     }
-  }
-
-  private getChatRoomDisplayName(chatRoom: ChatRoom): string {
-    return chatRoom ? chatRoom.displayName ? chatRoom.displayName : chatRoom.uuid : '';
   }
 
 }

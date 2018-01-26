@@ -16,7 +16,7 @@
           </div>
         </li>
         <li class="list-group-item" [ngClass]="{'chat-room-joined' : isChatRoomJoined(chatRoom)}" *ngFor="let chatRoom of chatRooms">
-          <a (click)="joinChatRoom(chatRoom)">{{getChatRoomDisplayName(chatRoom)}}</a>
+          <a (click)="joinChatRoom(chatRoom)">{{chatRoom.displayName}}</a>
         </li>
       </ul>
     </div>
