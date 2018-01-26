@@ -25,6 +25,30 @@ export class ChatService {
 
   constructor(private db: AngularFireDatabase, private storeService: StoreService) { }
 
+  createNewChatRoom(chatRoomName: string): Promise<firebase.database.Reference> {
+    return this.db.database.ref(this.CHATROOMS_LIST_REF).orderByChild('displayName').equalTo(chatRoomName)
+      .once('value')
+      .then(snapshot => {
+        if (snapshot.exists()) {
+          console.debug('Chatroom ' + chatRoomName + ' found');
+          // Retrieve chatroom
+          let uuid = Object.keys(snapshot.val())[0]; // uuid is the key under which the chatroom has been stored!
+          return this.db.database.ref(StringFormat.format(this.CHATROOMS_LIST_CHATROOM_REF, uuid));
+        } else {
+          console.debug('Chatroom ' + chatRoomName + ' not found, creating it...');
+          let chatRoomReference = this.db.database.ref(this.CHATROOMS_LIST_REF).push();
+          let uuid = chatRoomReference.key;
+          let chatRoom = new ChatRoom(uuid, chatRoomName);
+          return chatRoomReference.set(chatRoom)
+            .then(
+            res => {
+              console.debug('Chatroom ' + chatRoomName + ' created');
+              return chatRoomReference;
+            });
+        }
+      });
+  }
+
   getChatRoom(chatRoomName: string): Promise<ChatRoom> {
     return this.db.database.ref(this.CHATROOMS_LIST_REF).orderByChild('displayName').equalTo(chatRoomName)
       .once('value')
@@ -113,32 +137,27 @@ export class ChatService {
   registerUser(chatUser: ChatUser, chatRoom: ChatRoom = null): firebase.database.Reference {
     if (chatRoom) {
       // Register user in chatroom if not already done
-      let userRef = this.db.database.ref(StringFormat.format(this.CHATROOMS_CHATROOM_USERS_USER_REF, chatRoom.uuid, chatUser.uuid));
-      userRef.once('value', res => {
-        if (!res.exists()) {
-          userRef.set(chatUser);
+      let chatRoomUserRef = this.db.database.ref(StringFormat.format(this.CHATROOMS_CHATROOM_USERS_USER_REF, chatRoom.uuid, chatUser.uuid));
+      chatRoomUserRef.once('value', snapshot => {
+        if (!snapshot.exists()) {
+          console.debug('Registering user ' + chatUser.displayName + '...')
+          chatRoomUserRef.set(chatUser);
         }
       });
       // Remove user on disconnect
-      userRef.onDisconnect().remove();
-      // TODO: chatRoom should become inactive when no more users are connected
-      // Handle disconnect of chatroom
-      // chatRoomReference.onDisconnect().update({ active: false });
-      return userRef;
+      chatRoomUserRef.onDisconnect().remove();
+      return chatRoomUserRef;
     } else {
       // Register user in chatbox if not already done
-      let userRef = this.db.database.ref(StringFormat.format(this.CHATBOX_USERS_USER_REF, chatUser.uuid));
-      userRef.once('value', res => {
-        if (!res.exists()) {
-          userRef.set(chatUser);
+      let chatBoxUserRef = this.db.database.ref(StringFormat.format(this.CHATBOX_USERS_USER_REF, chatUser.uuid));
+      chatBoxUserRef.once('value', snapshot => {
+        if (!snapshot.exists()) {
+          chatBoxUserRef.set(chatUser);
         }
       });
       // Remove user on disconnect
-      userRef.onDisconnect().remove();
-      // TODO: chatRoom should become inactive when no more users are connected
-      // Handle disconnect of chatroom
-      // chatRoomReference.onDisconnect().update({ active: false });
-      return userRef;
+      chatBoxUserRef.onDisconnect().remove();
+      return chatBoxUserRef;
     }
   }
 

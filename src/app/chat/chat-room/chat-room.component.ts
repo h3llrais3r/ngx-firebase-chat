@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import { ChatRoom } from '../chat';
 import { ChatService } from '../chat.service';
+import * as firebase from 'firebase/app';
 
 @Component({
   selector: 'app-chat-room',
@@ -14,6 +15,7 @@ export class ChatRoomComponent implements OnInit {
 
   chatRooms: ChatRoom[];
   chatRoom: ChatRoom;
+  chatRoomRef: firebase.database.Reference;
   newChatRoomName: string = null;
 
   constructor(private chatService: ChatService) { }
@@ -48,6 +50,20 @@ export class ChatRoomComponent implements OnInit {
               this.newChatRoomName = null;
             });
         }
+      });
+  }
+
+  createNewChatRoom(): void {
+    this.chatService.createNewChatRoom(this.getNewChatRoomName())
+      .then(ref => {
+        console.log(ref);
+        this.chatRoomRef = ref;
+        this.chatRoomRef.once('value')
+          .then(snapshot => {
+            this.chatRoom = <ChatRoom>snapshot.val();
+            console.log(this.chatRoom);
+            this.newChatRoomName = null;
+          });
       });
   }
 
