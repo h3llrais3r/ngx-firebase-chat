@@ -61,7 +61,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnChanges {
     if (chatRoomChange) {
       // Only reload when currentValue != previousValue (on firstChange previousValue is undefined so skip that also)
       if (!chatRoomChange.firstChange && chatRoomChange.currentValue !== chatRoomChange.previousValue) {
-        console.log('Chatroom changed to ' + this.chatRoom);
+        console.log('Chatroom changed to ' + this.chatRoom.displayName);
         this.loadChatComponent(this.chatRoom);
       }
     }

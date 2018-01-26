@@ -17,7 +17,8 @@ export class ChatRoomComponent implements OnInit {
   chatRooms: ChatRoom[];
   chatRoom: ChatRoom;
   chatRoomRef: firebase.database.Reference;
-  newChatRoomName: string = null;
+
+  chatRoomName: string = null; // the chatroom name to start
 
   constructor(private chatService: ChatService) { }
 
@@ -29,7 +30,6 @@ export class ChatRoomComponent implements OnInit {
         // See https://github.com/angular/angularfire2/issues/1299
         this.chatRooms = chatRooms.map(chatRoom => ChatRoom.fromData(chatRoom));
         // this.chatRooms = chatRooms;
-        console.log(this.chatRooms);
         if (this.chatRoom && !this.chatRooms.find(chatRoom => chatRoom.uuid === this.chatRoom.uuid)) {
           // Remove current chatroom when it's disconnected
           console.log('Chatroom ' + this.chatRoom.displayName + ' no longer active');
@@ -38,52 +38,38 @@ export class ChatRoomComponent implements OnInit {
       });
   }
 
-  createChatRoom(): void {
-    console.log('Creating chatroom ' + this.getNewChatRoomName());
-    // check if the chatroom already exists, create a new one otherwise
-    this.chatService.getChatRoom(this.getNewChatRoomName())
-      .then(chatRoom => {
-        if (chatRoom) {
-          console.log('Chatroom ' + this.getNewChatRoomName() + ' already exists, retrieving it...')
-          this.chatRoom = chatRoom;
-          this.newChatRoomName = null;
-        } else {
-          console.log('Chatroom ' + this.getNewChatRoomName() + ' does not exist, creating it...');
-          this.chatService.createChatRoom(this.getNewChatRoomName())
-            .then(chatRoom => {
-              this.chatRoom = chatRoom;
-              this.newChatRoomName = null;
-            });
-        }
-      });
-  }
-
-  createNewChatRoom(): void {
-    this.chatService.createNewChatRoom(this.getNewChatRoomName())
-      .then(ref => {
-        console.log(ref);
-        this.chatRoomRef = ref;
+  startChatRoom(): void {
+    console.log('Starting chatroom ' + this.getFullChatRoomName());
+    this.chatService.startChatRoom(this.getFullChatRoomName())
+      .then(chatRoomRef => {
+        this.chatRoomRef = chatRoomRef;
         this.chatRoomRef.once('value')
           .then(snapshot => {
             this.chatRoom = <ChatRoom>snapshot.val();
             console.log(this.chatRoom);
-            this.newChatRoomName = null;
+            this.chatRoomName = null;
           });
       });
   }
 
   joinChatRoom(chatRoom: ChatRoom): void {
-    this.chatRoom = chatRoom;
-    console.log('Joining chatroom ' + this.chatRoom.displayName);
+    console.log('Joining chatroom ' + chatRoom.displayName);
+    this.chatService.getChatRoomByUuid(chatRoom.uuid)
+      .then(chatRoomRef => {
+        this.chatRoomRef = chatRoomRef;
+        this.chatRoom = chatRoom;
+        console.debug(chatRoomRef);
+        console.debug(chatRoom);
+      });
   }
 
   isChatRoomJoined(chatRoom: ChatRoom): boolean {
     return this.chatRoom && this.chatRoom.uuid === chatRoom.uuid;
   }
 
-  private getNewChatRoomName(): string {
-    if (this.newChatRoomName) {
-      return this.CHATROOM_PREFIX + this.newChatRoomName;
+  private getFullChatRoomName(): string {
+    if (this.chatRoomName) {
+      return this.CHATROOM_PREFIX + this.chatRoomName;
     }
     return null;
   }

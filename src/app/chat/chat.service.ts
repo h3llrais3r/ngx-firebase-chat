@@ -25,63 +25,55 @@ export class ChatService {
 
   constructor(private db: AngularFireDatabase, private storeService: StoreService) { }
 
-  createNewChatRoom(chatRoomName: string): Promise<firebase.database.Reference> {
-    return this.db.database.ref(this.CHATROOMS_LIST_REF).orderByChild('displayName').equalTo(chatRoomName)
-      .once('value')
-      .then(snapshot => {
-        if (snapshot.exists()) {
-          console.debug('Chatroom ' + chatRoomName + ' found');
-          // Retrieve chatroom
-          let uuid = Object.keys(snapshot.val())[0]; // uuid is the key under which the chatroom has been stored!
-          return this.db.database.ref(StringFormat.format(this.CHATROOMS_LIST_CHATROOM_REF, uuid));
+  startChatRoom(name: string): Promise<firebase.database.Reference> {
+    console.debug('Checking if chatroom ' + name + ' already exists...');
+    return this.getChatRoomByName(name)
+      .then(ref => {
+        if (ref) {
+          // Return the chatroom reference if it already exists
+          return ref;
         } else {
-          console.debug('Chatroom ' + chatRoomName + ' not found, creating it...');
-          let chatRoomReference = this.db.database.ref(this.CHATROOMS_LIST_REF).push();
-          let uuid = chatRoomReference.key;
-          let chatRoom = new ChatRoom(uuid, chatRoomName);
-          return chatRoomReference.set(chatRoom)
-            .then(
-            res => {
-              console.debug('Chatroom ' + chatRoomName + ' created');
-              return chatRoomReference;
-            });
+          // Create a new chatroom and return it's reference
+          console.debug('Creating chatroom ' + name + '...');
+          return this.createChatRoom(name);
         }
       });
   }
 
-  getChatRoom(chatRoomName: string): Promise<ChatRoom> {
-    return this.db.database.ref(this.CHATROOMS_LIST_REF).orderByChild('displayName').equalTo(chatRoomName)
+  getChatRoomByName(name: string): Promise<firebase.database.Reference> {
+    return this.db.database.ref(this.CHATROOMS_LIST_REF).orderByChild('name').equalTo(name)
       .once('value')
       .then(snapshot => {
         if (snapshot.exists()) {
-          console.debug('Chatroom ' + chatRoomName + ' found');
-          // Retrieve chatroom
+          // Chatroom found, return chatroom reference
+          console.debug('Chatroom ' + name + ' found');
           let uuid = Object.keys(snapshot.val())[0]; // uuid is the key under which the chatroom has been stored!
-          return this.db.database.ref(StringFormat.format(this.CHATROOMS_LIST_CHATROOM_REF, uuid))
-            .once('value')
-            .then(snapshot => {
-              return <ChatRoom>snapshot.val();
-            });
+          return this.db.database.ref(StringFormat.format(this.CHATROOMS_LIST_CHATROOM_REF, uuid));
         } else {
-          console.debug('Chatroom ' + chatRoomName + ' not found');
+          // Chatroom doesn't exist
+          console.debug('Chatroom ' + name + ' not found');
           return null;
         }
       });
   }
 
-  createChatRoom(displayName: string = null): Promise<ChatRoom> {
-    // Create chatroom (we use the key from firebase as uuid of the chat)
+  getChatRoomByUuid(uuid: string): Promise<firebase.database.Reference> {
+    return Promise.resolve(this.db.database.ref(StringFormat.format(this.CHATROOMS_CHATROOM_REF, uuid)));
+  }
+
+  createChatRoom(chatRoomName: string = null): Promise<firebase.database.Reference> {
+    // Create chatroom
     let chatRoomReference = this.db.database.ref(this.CHATROOMS_LIST_REF).push();
     let uuid = chatRoomReference.key;
-    let chatRoom = new ChatRoom(uuid, displayName);
+    let chatRoom = new ChatRoom(uuid, chatRoomName);
     return chatRoomReference.set(chatRoom)
       .then(() => {
-        console.debug('Chatroom ' + chatRoom.displayName + ' created');
+        console.debug('Chatroom ' + chatRoomName + ' created');
         // Push welcome message
         this.db.database.ref(StringFormat.format(this.CHATROOMS_CHATROOM_CHATS_REF, uuid))
           .push(new Chat(null, new Date(), 'Welcome to chatroom ' + chatRoom.displayName));
-        // return created chatroom
-        return chatRoom;
+        // Return chatroom reference
+        return chatRoomReference;
       });
   }
 
@@ -140,7 +132,7 @@ export class ChatService {
       let chatRoomUserRef = this.db.database.ref(StringFormat.format(this.CHATROOMS_CHATROOM_USERS_USER_REF, chatRoom.uuid, chatUser.uuid));
       chatRoomUserRef.once('value', snapshot => {
         if (!snapshot.exists()) {
-          console.debug('Registering user ' + chatUser.displayName + '...')
+          console.debug('Registering user ' + chatUser.displayName + ' in chatroom ' + chatRoom.displayName + '...')
           chatRoomUserRef.set(chatUser);
         }
       });
@@ -152,6 +144,7 @@ export class ChatService {
       let chatBoxUserRef = this.db.database.ref(StringFormat.format(this.CHATBOX_USERS_USER_REF, chatUser.uuid));
       chatBoxUserRef.once('value', snapshot => {
         if (!snapshot.exists()) {
+          console.debug('Registering user ' + chatUser.displayName + ' in chatbox...')
           chatBoxUserRef.set(chatUser);
         }
       });

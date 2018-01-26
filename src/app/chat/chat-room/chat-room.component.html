@@ -9,14 +9,14 @@
         <li class="list-group-item">
           <div class="input-group">
             <span class="input-group-addon">#</span>
-            <input type="text" [(ngModel)]="newChatRoomName" class="form-control" placeholder="ChatRoom name">
+            <input type="text" [(ngModel)]="chatRoomName" (keyup.enter)="startChatRoom()" class="form-control" placeholder="Chat room name">
             <span class="input-group-btn">
-              <button (click)="createChatRoom()" class="btn btn-primary">New chat room</button>
+              <button (click)="startChatRoom()" class="btn btn-primary">Start chat room</button>
             </span>
           </div>
         </li>
-        <li class="list-group-item" [ngClass]="{'chat-room-joined' : isChatRoomJoined(chatRoom)}" *ngFor="let chatRoom of chatRooms">
-          <a (click)="joinChatRoom(chatRoom)">{{chatRoom.displayName}}</a>
+        <li (click)="joinChatRoom(chatRoom)" class="list-group-item chat-room" [ngClass]="{'chat-room-joined' : isChatRoomJoined(chatRoom)}" *ngFor="let chatRoom of chatRooms">
+          <span>{{chatRoom.displayName}}</span>
         </li>
       </ul>
     </div>

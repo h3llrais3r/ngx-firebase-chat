@@ -1,13 +1,20 @@
+.chat-room {
+    cursor: pointer;
+}
+
+.chat-room:hover {
+    /* Bootstrap bg-info color */
+    background-color: #d9edf7;
+}
+
 .chat-room-joined {
     /* Bootstrap bg-primary color */
     background-color: #337ab7;
+    color: #ffffff;
     font-weight: bold;
 }
 
-.chat-room-joined a {
-    color: #ffffff;
-}
-
-li a {
-    cursor: pointer;
+.chat-room-joined:hover {
+    /* Bootstrap btn-primary:hover color */
+    background-color: #286090;
 }
