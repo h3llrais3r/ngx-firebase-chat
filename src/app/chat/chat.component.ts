@@ -93,7 +93,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   private loadChatComponent(chatRoom: ChatRoom): void {
-    this.chatUserRef = this.chatService.registerUser(this.chatUser, this.chatRoom);
+    this.chatUserRef = this.chatService.registerUser(this.chatUser, chatRoom);
     this.loadChats(chatRoom);
     this.loadChatUsers(chatRoom);
   }
