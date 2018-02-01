@@ -17,7 +17,7 @@ export class ChatAdminComponent implements OnInit {
 
   ngOnInit() {
     // Only get active chatrooms
-    this.chatService.getChatRooms(true).valueChanges()
+    this.chatService.getChatRooms().valueChanges()
       .subscribe(chatRooms => {
         this.chatRooms = chatRooms;
         if (this.chatRoom && !this.chatRooms.find(chatRoom => chatRoom.uuid === this.chatRoom.uuid)) {

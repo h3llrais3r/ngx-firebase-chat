@@ -95,12 +95,14 @@ export class ChatService {
     //chatRoomReference.onDisconnect().update({ active: false });
   }
 
-  getChatRooms(active: boolean = false): AngularFireList<ChatRoom> {
+  getChatRooms(active?: boolean): AngularFireList<ChatRoom> {
     // We keep a list of chatroom uuids to prevent the loading of all chatrooms
-    if (active) {
-      return this.db.list(this.CHATROOMS_LIST_REF, ref => ref.orderByChild('active').equalTo(true));
-    } else {
+    if (active === undefined) {
+      // Fetch all
       return this.db.list(this.CHATROOMS_LIST_REF);
+    } else {
+      // Fetch based on active flag
+      return this.db.list(this.CHATROOMS_LIST_REF, ref => ref.orderByChild('active').equalTo(active));
     }
   }
 
