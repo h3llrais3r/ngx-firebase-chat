@@ -24,12 +24,6 @@ export class ChatAdminComponent implements OnInit {
         // Since the AngularFireList does not actually returns of the typed objects, we need to cast them ourselves
         // See https://github.com/angular/angularfire2/issues/1299
         this.chatRooms = chatRooms.map(chatRoom => ChatRoom.fromData(chatRoom));
-        // this.chatRooms = chatRooms;
-        if (this.chatRoom && !this.chatRooms.find(chatRoom => chatRoom.uuid === this.chatRoom.uuid)) {
-          // Remove current chatroom when it's disconnected
-          console.log('Chatroom ' + this.chatRoom.uuid + ' no longer active');
-          this.chatRoom = null;
-        }
       });
   }
 
@@ -37,15 +31,25 @@ export class ChatAdminComponent implements OnInit {
     console.log('Joining chatroom ' + chatRoom.displayName);
     this.chatService.getChatRoomByUuid(chatRoom.uuid)
       .then(chatRoomRef => {
+        this.handleChatRoomStatus(chatRoomRef);
         this.chatRoomRef = chatRoomRef;
         this.chatRoom = chatRoom;
-        console.debug(chatRoomRef);
-        console.debug(chatRoom);
       });
   }
 
   isChatRoomJoined(chatRoom: ChatRoom): boolean {
     return this.chatRoom && this.chatRoom.uuid === chatRoom.uuid;
+  }
+
+  private handleChatRoomStatus(chatRoomRef: firebase.database.Reference): void {
+    chatRoomRef.onDisconnect().update({ 'active': false });
+    chatRoomRef.on('value', snapshot => {
+      let chatRoom = <ChatRoom>snapshot.val();
+      if (this.chatRoom && this.chatRoom.uuid === chatRoom.uuid && !chatRoom.active) {
+        console.debug('Keeping chatroom ' + chatRoom.displayName + ' active...');
+        snapshot.ref.update({ 'active': true });
+      }
+    });
   }
 
 }
