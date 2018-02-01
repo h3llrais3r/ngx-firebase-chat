@@ -46,7 +46,6 @@ export class ChatRoomComponent implements OnInit {
         this.chatRoomRef.once('value')
           .then(snapshot => {
             this.chatRoom = <ChatRoom>snapshot.val();
-            console.log(this.chatRoom);
             this.chatRoomName = null;
           });
       });
@@ -58,8 +57,6 @@ export class ChatRoomComponent implements OnInit {
       .then(chatRoomRef => {
         this.chatRoomRef = chatRoomRef;
         this.chatRoom = chatRoom;
-        console.debug(chatRoomRef);
-        console.debug(chatRoom);
       });
   }
 
