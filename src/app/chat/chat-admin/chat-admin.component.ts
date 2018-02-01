@@ -48,7 +48,7 @@ export class ChatAdminComponent implements OnInit {
     // Deactivate chatroom if we are no longer connected
     chatRoomRef.onDisconnect().update({ 'active': false });
     chatRoomRef.on('value', snapshot => {
-      let chatRoom = <ChatRoom>snapshot.val();
+      let chatRoom = ChatRoom.fromData(snapshot.val());
       // Only keep it active when we are currently in the chatroom
       if (this.chatRoom && this.chatRoom.uuid === chatRoom.uuid && !chatRoom.active) {
         console.debug('Keeping chatroom ' + chatRoom.displayName + ' active...');

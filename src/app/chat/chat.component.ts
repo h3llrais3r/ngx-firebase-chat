@@ -104,7 +104,11 @@ export class ChatComponent implements OnInit, AfterViewInit, OnChanges {
             // Load data
             this.loadChats(chatRoom);
             this.loadChatUsers(chatRoom);
-            console.log('Chatroom changed to ' + chatRoom.displayName);
+            if (chatRoom) {
+              console.log('Chat loaded for chatroom ' + chatRoom.displayName);
+            } else {
+              console.log('Chat loaded for chatbox');
+            }
           });
       });
   }
