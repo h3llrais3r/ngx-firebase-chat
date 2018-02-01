@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import * as firebase from 'firebase/app';
 import { Observable } from 'rxjs/Observable';
+import * as firebase from 'firebase/app';
 
 import { ChatRoom } from '../chat';
 import { ChatService } from '../chat.service';
