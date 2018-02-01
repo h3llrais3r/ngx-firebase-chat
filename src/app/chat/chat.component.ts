@@ -61,8 +61,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnChanges {
     if (chatRoomChange) {
       // Only reload when currentValue != previousValue (on firstChange previousValue is undefined so skip that also)
       if (!chatRoomChange.firstChange && chatRoomChange.currentValue !== chatRoomChange.previousValue) {
+        this.loadChatComponent(this.chatRoom, chatRoomChange.previousValue);
         console.log('Chatroom changed to ' + this.chatRoom.displayName);
-        this.loadChatComponent(this.chatRoom);
       }
     }
   }
@@ -92,10 +92,15 @@ export class ChatComponent implements OnInit, AfterViewInit, OnChanges {
     return this.chatUser === chat.user;
   }
 
-  private loadChatComponent(chatRoom: ChatRoom): void {
-    this.chatUserRef = this.chatService.registerUser(this.chatUser, chatRoom);
-    this.loadChats(chatRoom);
-    this.loadChatUsers(chatRoom);
+  private loadChatComponent(chatRoom: ChatRoom, previousChatRoom: ChatRoom = null): void {
+    // Disconnect from previously connected chatroom/chatbox
+    this.chatService.disconnectUser(this.chatUserRef, this.chatUser, previousChatRoom)
+      .then(() => {
+        // Connect to chatroom/chatbox
+        this.chatUserRef = this.chatService.connectUser(this.chatUser, chatRoom);
+        this.loadChats(chatRoom);
+        this.loadChatUsers(chatRoom);
+      });
   }
 
   private loadChats(chatRoom: ChatRoom): void {

@@ -108,7 +108,7 @@ export class ChatService {
 
   getChats(chatRoom: ChatRoom = null): AngularFireList<Chat> {
     if (chatRoom) {
-      console.debug('Getting chats from chatroom ' + chatRoom.uuid + '...');
+      console.debug('Getting chats from chatroom ' + chatRoom.displayName + '...');
       return this.db.list(StringFormat.format(this.CHATROOMS_CHATROOM_CHATS_REF, chatRoom.uuid));
     } else {
       console.debug('Getting chats from chatbox...')
@@ -128,32 +128,45 @@ export class ChatService {
     }
   }
 
-  registerUser(chatUser: ChatUser, chatRoom: ChatRoom = null): firebase.database.Reference {
+  connectUser(chatUser: ChatUser, chatRoom: ChatRoom = null): firebase.database.Reference {
     if (chatRoom) {
-      // Register user in chatroom if not already done
       let chatRoomUserRef = this.db.database.ref(StringFormat.format(this.CHATROOMS_CHATROOM_USERS_USER_REF, chatRoom.uuid, chatUser.uuid));
+      // Remove user on disconnect (to handle real disconnects like killing browser, ...)
+      chatRoomUserRef.onDisconnect().remove();
+      // Connect user with chatroom if not already done
       chatRoomUserRef.once('value', snapshot => {
         if (!snapshot.exists()) {
-          console.debug('Registering user ' + chatUser.displayName + ' in chatroom ' + chatRoom.displayName + '...')
+          console.debug('Connecting user ' + chatUser.displayName + ' with chatroom ' + chatRoom.displayName + '...')
           chatRoomUserRef.set(chatUser);
         }
       });
-      // Remove user on disconnect
-      chatRoomUserRef.onDisconnect().remove();
       return chatRoomUserRef;
     } else {
-      // Register user in chatbox if not already done
       let chatBoxUserRef = this.db.database.ref(StringFormat.format(this.CHATBOX_USERS_USER_REF, chatUser.uuid));
+      // Remove user on disconnect
+      chatBoxUserRef.onDisconnect().remove();
+      // Connect user with chatbox if not already done
       chatBoxUserRef.once('value', snapshot => {
         if (!snapshot.exists()) {
-          console.debug('Registering user ' + chatUser.displayName + ' in chatbox...')
+          console.debug('Connecting user ' + chatUser.displayName + ' with chatbox...')
           chatBoxUserRef.set(chatUser);
         }
       });
-      // Remove user on disconnect
-      chatBoxUserRef.onDisconnect().remove();
       return chatBoxUserRef;
     }
+  }
+
+  disconnectUser(chatUserRef: firebase.database.Reference, chatUser: ChatUser, chatRoom: ChatRoom = null): Promise<any> {
+    if (chatUserRef) {
+      if (chatRoom) {
+        console.debug('Disconnecting user ' + chatUser.displayName + ' from chatroom ' + chatRoom.displayName + '...');
+      } else {
+        console.debug('Disconnecting user ' + chatUser.displayName + ' from chatbox...');
+      }
+      // Remove user from chatroom/chatbox
+      return chatUserRef.remove();
+    }
+    return Promise.resolve(null);
   }
 
   setChatUserIsTyping(chatUserRef: firebase.database.Reference, isTyping: boolean = false) {
@@ -162,7 +175,7 @@ export class ChatService {
 
   getChatUsers(chatRoom: ChatRoom = null): AngularFireList<ChatUser> {
     if (chatRoom) {
-      console.debug('Getting chat users in chatroom ' + chatRoom.uuid + '...');
+      console.debug('Getting chat users in chatroom ' + chatRoom.displayName + '...');
       return this.db.list(StringFormat.format(this.CHATROOMS_CHATROOM_USERS_REF, chatRoom.uuid));
     } else {
       console.debug('Getting chat users in chatbox...')
