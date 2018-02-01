@@ -17,7 +17,7 @@ export class ChatService {
   // Chatrooms refs
   private CHATROOMS_REF = '/chatrooms';
   private CHATROOMS_LIST_REF = this.CHATROOMS_REF + '/list';
-  private CHATROOMS_LIST_CHATROOM_REF = this.CHATROOMS_LIST_REF + '/{0}';
+  private CHATROOMS_LIST_CHATROOM_REF = this.CHATROOMS_LIST_REF + '/{0}'; // Always use this to get reference to chatroom
   private CHATROOMS_CHATROOM_REF = this.CHATROOMS_REF + '/{0}';
   private CHATROOMS_CHATROOM_CHATS_REF = this.CHATROOMS_CHATROOM_REF + '/chats';
   private CHATROOMS_CHATROOM_USERS_REF = this.CHATROOMS_CHATROOM_REF + '/users';
@@ -58,7 +58,7 @@ export class ChatService {
   }
 
   getChatRoomByUuid(uuid: string): Promise<firebase.database.Reference> {
-    return Promise.resolve(this.db.database.ref(StringFormat.format(this.CHATROOMS_CHATROOM_REF, uuid)));
+    return Promise.resolve(this.db.database.ref(StringFormat.format(this.CHATROOMS_LIST_CHATROOM_REF, uuid)));
   }
 
   createChatRoom(chatRoomName: string = null): Promise<firebase.database.Reference> {
@@ -167,7 +167,7 @@ export class ChatService {
   }
 
   private handleChatRoomStatus(chatRoom: ChatRoom): void {
-    console.debug('Handling status of chatroom  ' + chatRoom.displayName + '...');
+    console.debug('Handling status of chatroom ' + chatRoom.displayName + '...');
     this.db.database.ref(StringFormat.format(this.CHATROOMS_CHATROOM_USERS_REF, chatRoom.uuid))
       .once('value', snapshot => {
         if (!snapshot.exists()) {
