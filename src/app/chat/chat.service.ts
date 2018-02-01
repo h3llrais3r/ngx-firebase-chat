@@ -128,31 +128,33 @@ export class ChatService {
     }
   }
 
-  connectUser(chatUser: ChatUser, chatRoom: ChatRoom = null): firebase.database.Reference {
+  connectUser(chatUser: ChatUser, chatRoom: ChatRoom = null): Promise<firebase.database.Reference> {
     if (chatRoom) {
       let chatRoomUserRef = this.db.database.ref(StringFormat.format(this.CHATROOMS_CHATROOM_USERS_USER_REF, chatRoom.uuid, chatUser.uuid));
       // Remove user on disconnect (to handle real disconnects like killing browser, ...)
       chatRoomUserRef.onDisconnect().remove();
-      // Connect user with chatroom if not already done
-      chatRoomUserRef.once('value', snapshot => {
-        if (!snapshot.exists()) {
-          console.debug('Connecting user ' + chatUser.displayName + ' with chatroom ' + chatRoom.displayName + '...')
-          chatRoomUserRef.set(chatUser);
-        }
-      });
-      return chatRoomUserRef;
+      // Connect user to chatroom if not already done
+      return chatRoomUserRef
+        .once('value', snapshot => {
+          if (!snapshot.exists()) {
+            console.debug('Connecting user ' + chatUser.displayName + ' to chatroom ' + chatRoom.displayName + '...');
+            chatRoomUserRef.set(chatUser);
+          }
+        })
+        .then(snapshot => Promise.resolve(chatRoomUserRef));
     } else {
       let chatBoxUserRef = this.db.database.ref(StringFormat.format(this.CHATBOX_USERS_USER_REF, chatUser.uuid));
       // Remove user on disconnect
       chatBoxUserRef.onDisconnect().remove();
-      // Connect user with chatbox if not already done
-      chatBoxUserRef.once('value', snapshot => {
-        if (!snapshot.exists()) {
-          console.debug('Connecting user ' + chatUser.displayName + ' with chatbox...')
-          chatBoxUserRef.set(chatUser);
-        }
-      });
-      return chatBoxUserRef;
+      // Connect user to chatbox if not already done
+      return chatBoxUserRef
+        .once('value', snapshot => {
+          if (!snapshot.exists()) {
+            console.debug('Connecting user ' + chatUser.displayName + ' to chatbox...');
+            chatBoxUserRef.set(chatUser);
+          }
+        })
+        .then(() => Promise.resolve(chatBoxUserRef));
     }
   }
 

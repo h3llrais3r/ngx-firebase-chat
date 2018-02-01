@@ -97,9 +97,13 @@ export class ChatComponent implements OnInit, AfterViewInit, OnChanges {
     this.chatService.disconnectUser(this.chatUserRef, this.chatUser, previousChatRoom)
       .then(() => {
         // Connect to chatroom/chatbox
-        this.chatUserRef = this.chatService.connectUser(this.chatUser, chatRoom);
-        this.loadChats(chatRoom);
-        this.loadChatUsers(chatRoom);
+        this.chatService.connectUser(this.chatUser, chatRoom)
+          .then(ref => {
+            this.chatUserRef = ref;
+            // Load data
+            this.loadChats(chatRoom);
+            this.loadChatUsers(chatRoom);
+          });
       });
   }
 
