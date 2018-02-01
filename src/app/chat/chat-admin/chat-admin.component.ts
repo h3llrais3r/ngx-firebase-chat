@@ -41,10 +41,15 @@ export class ChatAdminComponent implements OnInit {
     return this.chatRoom && this.chatRoom.uuid === chatRoom.uuid;
   }
 
+  // By default we'll mark the chatroom as not active when we are disconnecting
+  // But we also listen to changes on the 'active' field of the chatroom
+  // If someone else disconnects and marks the chatroom as not active, we are activating it only when we are still connected to it
   private handleChatRoomStatus(chatRoomRef: firebase.database.Reference): void {
+    // Deactivate chatroom if we are no longer connected
     chatRoomRef.onDisconnect().update({ 'active': false });
     chatRoomRef.on('value', snapshot => {
       let chatRoom = <ChatRoom>snapshot.val();
+      // Only keep it active when we are currently in the chatroom
       if (this.chatRoom && this.chatRoom.uuid === chatRoom.uuid && !chatRoom.active) {
         console.debug('Keeping chatroom ' + chatRoom.displayName + ' active...');
         snapshot.ref.update({ 'active': true });
