@@ -18,7 +18,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnChanges {
 
   @Input()
   chatRoom: ChatRoom;
-  chatRoomRef: firebase.database.Reference;
 
   chatUser: ChatUser;
   chatUserRef: firebase.database.Reference;
@@ -59,10 +58,12 @@ export class ChatComponent implements OnInit, AfterViewInit, OnChanges {
     // Only handle changes for chatRoom (for now only chatRoom is monitored)
     let chatRoomChange: SimpleChange = changes.chatRoom;
     if (chatRoomChange) {
+      // Make sure it's a ChatRoom object (to be able to use the displayName property)
+      this.chatRoom = this.chatRoom instanceof ChatRoom ? this.chatRoom : ChatRoom.fromData(this.chatRoom);
       // Only reload when currentValue != previousValue (on firstChange previousValue is undefined so skip that also)
-      if (!chatRoomChange.firstChange && chatRoomChange.currentValue !== chatRoomChange.previousValue) {
-        this.loadChatComponent(this.chatRoom, chatRoomChange.previousValue);
-        console.log('Chatroom changed to ' + this.chatRoom.displayName);
+      if (!chatRoomChange.firstChange && chatRoomChange.currentValue && chatRoomChange.currentValue !== chatRoomChange.previousValue) {
+        let previousChatRoom = ChatRoom.fromData(chatRoomChange.previousValue);
+        this.loadChatComponent(this.chatRoom, previousChatRoom);
       }
     }
   }
@@ -103,6 +104,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnChanges {
             // Load data
             this.loadChats(chatRoom);
             this.loadChatUsers(chatRoom);
+            console.log('Chatroom changed to ' + chatRoom.displayName);
           });
       });
   }
