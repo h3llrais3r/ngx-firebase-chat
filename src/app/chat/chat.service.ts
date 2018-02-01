@@ -30,23 +30,13 @@ export class ChatService {
     return this.getChatRoomByName(name)
       .then(ref => {
         if (ref) {
-          // Return the chatroom reference if it already exists
+          // Activate the existing chatroom and return its reference
           return this.activateChatRoom(ref, name);
         } else {
-          // Create a new chatroom and return it's reference
+          // Create a new chatroom and return its reference
           console.debug('Creating chatroom ' + name + '...');
           return this.createChatRoom(name);
         }
-      });
-  }
-
-  private activateChatRoom(chatRoomRef: firebase.database.Reference, name: string): Promise<firebase.database.Reference> {
-    // Ativate chatroom
-    return chatRoomRef
-      .update({ active: true })
-      .then(() => {
-        console.debug('Activating chatroom ' + name + '...');
-        return chatRoomRef;
       });
   }
 
@@ -73,17 +63,27 @@ export class ChatService {
 
   createChatRoom(chatRoomName: string = null): Promise<firebase.database.Reference> {
     // Create chatroom
-    let chatRoomReference = this.db.database.ref(this.CHATROOMS_LIST_REF).push();
-    let uuid = chatRoomReference.key;
+    let chatRoomRef = this.db.database.ref(this.CHATROOMS_LIST_REF).push();
+    let uuid = chatRoomRef.key;
     let chatRoom = new ChatRoom(uuid, chatRoomName);
-    return chatRoomReference.set(chatRoom)
+    return chatRoomRef.set(chatRoom)
       .then(() => {
         console.debug('Chatroom ' + chatRoomName + ' created');
         // Push welcome message
         this.db.database.ref(StringFormat.format(this.CHATROOMS_CHATROOM_CHATS_REF, uuid))
           .push(new Chat(null, new Date(), 'Welcome to chatroom ' + chatRoom.displayName));
         // Return chatroom reference
-        return chatRoomReference;
+        return chatRoomRef;
+      });
+  }
+
+  activateChatRoom(chatRoomRef: firebase.database.Reference, name: string): Promise<firebase.database.Reference> {
+    // Ativate chatroom
+    return chatRoomRef
+      .update({ active: true })
+      .then(() => {
+        console.debug('Activating chatroom ' + name + '...');
+        return chatRoomRef;
       });
   }
 
@@ -155,7 +155,7 @@ export class ChatService {
       if (chatRoom) {
         console.debug('Disconnecting user ' + chatUser.displayName + ' from chatroom ' + chatRoom.displayName + '...');
         // Remove user from chatroom and handle chatroom status
-        return chatUserRef.remove(() => this.handleDisconnectFromChatRoom(chatRoom));
+        return chatUserRef.remove(() => this.handleChatRoomStatus(chatRoom));
       } else {
         console.debug('Disconnecting user ' + chatUser.displayName + ' from chatbox...');
         // Remove user from chatbox
@@ -166,12 +166,12 @@ export class ChatService {
     return Promise.resolve(null);
   }
 
-  private handleDisconnectFromChatRoom(chatRoom: ChatRoom): void {
-    console.debug('Handling disconnect from chatroom  ' + chatRoom.displayName + '...');
+  private handleChatRoomStatus(chatRoom: ChatRoom): void {
+    console.debug('Handling status of chatroom  ' + chatRoom.displayName + '...');
     this.db.database.ref(StringFormat.format(this.CHATROOMS_CHATROOM_USERS_REF, chatRoom.uuid))
       .once('value', snapshot => {
         if (!snapshot.exists()) {
-          // Deactivate chatroom if no users are longer connected
+          // Deactivate chatroom if no more users are connected
           console.debug('Deactivating chatroom ' + chatRoom.displayName + '...')
           this.db.database.ref(StringFormat.format(this.CHATROOMS_LIST_CHATROOM_REF, chatRoom.uuid))
             .update({ 'active': false });
