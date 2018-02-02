@@ -116,7 +116,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnChanges {
   private loadChats(chatRoom: ChatRoom): void {
     this.chatService.getChats(this.chatRoom).valueChanges()
       .subscribe(chats => {
-        this.chats = chats.reverse();
+        // Make sure it's a list of Chat objects and sort them to have the latest first
+        this.chats = chats.map(chat => Chat.fromData(chat)).reverse();
         // Don't show notification for my own chats
         if (this.notifyNewChats && this.chats[0].user !== this.chatUser) {
           this.pushNotificationsService.create('New chat available').subscribe();
@@ -127,7 +128,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnChanges {
   private loadChatUsers(chatRoom: ChatRoom): void {
     this.chatService.getChatUsers(this.chatRoom).valueChanges()
       .subscribe(chatUsers => {
-        this.chatUsers = chatUsers.sort((user1, user2) => user1.displayName < user2.displayName ? -1 : user1.displayName > user2.displayName ? 1 : 0);
+        // Make sure it's a list of Chat objects and sort them alphabetically
+        this.chatUsers = chatUsers.map(chatUser => ChatUser.fromData(chatUser)).sort((user1, user2) => user1.displayName < user2.displayName ? -1 : user1.displayName > user2.displayName ? 1 : 0);
         // Filter which users are typing (exluding current user)
         this.chatUsersTyping = this.chatUsers.filter(chatUser => chatUser.isTyping && chatUser.uuid !== this.chatUser.uuid).map(chatUser => chatUser.displayName);
         if (this.chatUsersTyping && this.chatUsersTyping.length > 0) {

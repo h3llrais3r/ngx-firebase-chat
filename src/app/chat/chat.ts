@@ -10,6 +10,13 @@ export class Chat {
     this.timestamp = new DateTimeFormatPipe('nl-BE').transform(timestamp);
     this.message = message;
   }
+
+  // Helper method to construct the Chat object from a json object (with same object interface)
+  static fromData(chat: Chat) {
+    // The chatUser is empty for welcome messages!
+    let chatUser = chat.user ? ChatUser.fromData(chat.user) : null;
+    return new Chat(chatUser, new DateTimeFormatPipe('nl-BE').transform(chat.timestamp), chat.message);
+  }
 }
 
 export class ChatUser {
@@ -17,14 +24,19 @@ export class ChatUser {
   name: string;
   isTyping: boolean = false;
 
-  constructor(uuid: string, name: string) {
+  constructor(uuid: string, name: string, isTyping: boolean = false) {
     this.uuid = uuid;
     this.name = name;
-    this.isTyping = false;
+    this.isTyping = isTyping;
   }
 
   get displayName(): string {
     return this.name ? this.name : this.uuid;
+  }
+
+  // Helper method to construct the ChatUser object from a json object (with same object interface)
+  static fromData(chatUserData: ChatUser) {
+    return new ChatUser(chatUserData.uuid, chatUserData.name, chatUserData.isTyping);
   }
 }
 
