@@ -32,7 +32,7 @@ export class NavbarComponent implements OnInit {
   }
 
   isAuthenticated(): boolean {
-    return this.currentUser;
+    return this.currentUser === null;
   }
 
   isAuthenticatedAsAdmin(): boolean {
