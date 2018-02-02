@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import * as firebase from '@firebase/app';
+import * as firebase from 'firebase/app';
 
 import { AuthService } from '../auth/auth.service';
 
@@ -14,12 +14,12 @@ export class HomeComponent implements OnInit {
 
   constructor(private authService: AuthService) { }
 
-  ngOnInit() { 
+  ngOnInit() {
     this.authService.getAuthState().subscribe(user => this.currentUser = user);
-   }
+  }
 
   isAuthenticated(): boolean {
-    return this.currentUser;
+    return this.currentUser === null;
   }
 
 }
