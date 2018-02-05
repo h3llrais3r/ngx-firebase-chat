@@ -2,7 +2,8 @@ import { DateTimeFormatPipe } from "../shared/pipe/date-time-format.pipe";
 
 export enum MessageType {
   MESSAGE = "MESSAGE",
-  IMAGE = "IMAGE"
+  IMAGE = "IMAGE",
+  FILE = "FILE"
 }
 
 export class Chat {
@@ -10,19 +11,21 @@ export class Chat {
   timestamp: string;
   messageType: MessageType;
   message: string;
+  downloadUrl?: string;
 
-  constructor(user: ChatUser, timestamp: Date, messageType: MessageType, message: string) {
+  constructor(user: ChatUser, timestamp: Date, messageType: MessageType, message: string, downloadUrl: string = null) {
     this.user = user;
     this.timestamp = new DateTimeFormatPipe('nl-BE').transform(timestamp);
     this.messageType = messageType;
     this.message = message;
+    this.downloadUrl = downloadUrl;
   }
 
   // Helper method to construct the Chat object from a json object (with same object interface)
   static fromData(chat: Chat) {
     // The chatUser is empty for welcome messages!
     let chatUser = chat.user ? ChatUser.fromData(chat.user) : null;
-    return new Chat(chatUser, new DateTimeFormatPipe('nl-BE').transform(chat.timestamp), chat.messageType, chat.message);
+    return new Chat(chatUser, new DateTimeFormatPipe('nl-BE').transform(chat.timestamp), chat.messageType, chat.message, chat.downloadUrl);
   }
 }
 

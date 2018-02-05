@@ -89,10 +89,15 @@ export class ChatComponent implements OnInit, AfterViewInit, OnChanges {
       file.fileEntry.file(fileObj => {
         this.chatService.uploadFile(fileObj).then(
           snapshot => {
-            // TODO: dectect file type and show donwload link for non images!
-            // Submit image chat
-            let chat = new Chat(this.chatUser, new Date(), MessageType.IMAGE, snapshot.downloadURL);
-            this.chatService.submitChat(chat, this.chatUserRef, this.chatRoom);
+            if (snapshot.metadata.contentType.indexOf('image') >= 0) {
+              // Submit image chat
+              let chat = new Chat(this.chatUser, new Date(), MessageType.IMAGE, snapshot.metadata.name, snapshot.downloadURL);
+              this.chatService.submitChat(chat, this.chatUserRef, this.chatRoom);
+            } else {
+              // Submit file chat
+              let chat = new Chat(this.chatUser, new Date(), MessageType.FILE, snapshot.metadata.name, snapshot.downloadURL);
+              this.chatService.submitChat(chat, this.chatUserRef, this.chatRoom);
+            }
           }
         );
       });
@@ -126,6 +131,10 @@ export class ChatComponent implements OnInit, AfterViewInit, OnChanges {
 
   isImageChat(chat: Chat): boolean {
     return chat.messageType === MessageType.IMAGE;
+  }
+
+  isFileChat(chat: Chat): boolean {
+    return chat.messageType === MessageType.FILE;
   }
 
   private loadChatComponent(chatRoom: ChatRoom, previousChatRoom: ChatRoom = null): void {
