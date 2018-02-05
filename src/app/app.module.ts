@@ -4,10 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { AngularFireModule } from 'angularfire2';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
+import { AngularFireStorageModule } from 'angularfire2/storage';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import { EmojiPickerModule } from 'ng-emoji-picker';
 import { PushNotificationsModule } from 'ng-push';
 import { Ng2Webstorage } from 'ngx-webstorage';
+import { FileDropModule } from 'ngx-file-drop';
 
 import { AppRoutingModule } from './app-routing.module';
 import { SharedModule } from './shared/shared.module';
@@ -44,10 +46,12 @@ import { StoreService } from './store/store.service';
     RouterModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireDatabaseModule,
+    AngularFireStorageModule,
     AngularFireAuthModule,
     EmojiPickerModule,
     PushNotificationsModule,
     Ng2Webstorage,
+    FileDropModule,
     AppRoutingModule,
     SharedModule
   ],

@@ -1,9 +1,10 @@
 import { Component, OnInit, AfterViewInit, Input, OnChanges, SimpleChanges, SimpleChange } from '@angular/core';
 import { EmojiService } from 'ng-emoji-picker';
 import { PushNotificationsService } from 'ng-push';
+import { UploadEvent, UploadFile } from 'ngx-file-drop';
 import * as firebase from 'firebase/app';
 
-import { Chat, ChatRoom, ChatUser } from './chat';
+import { Chat, ChatRoom, ChatUser, MessageType } from './chat';
 import { ChatService } from './chat.service';
 import { AuthService } from '../auth/auth.service';
 
@@ -26,6 +27,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnChanges {
   chatUsers: ChatUser[];
   chatUsersTyping: string[];
   chatUsersTypingMessage: string;
+
+  public files: UploadFile[] = [];
 
   notifyNewChats: boolean = false;
 
@@ -80,10 +83,34 @@ export class ChatComponent implements OnInit, AfterViewInit, OnChanges {
     }
   }
 
-  submitChat(event: any): void {
+  fileDrop(event: UploadEvent): void {
+    this.files = event.files;
+    for (const file of event.files) {
+      file.fileEntry.file(fileObj => {
+        this.chatService.uploadFile(fileObj).then(
+          snapshot => {
+            // TODO: dectect file type and show donwload link for non images!
+            // Submit image chat
+            let chat = new Chat(this.chatUser, new Date(), MessageType.IMAGE, snapshot.downloadURL);
+            this.chatService.submitChat(chat, this.chatUserRef, this.chatRoom);
+          }
+        );
+      });
+    }
+  }
+
+  fileOver(event) {
+    console.log(event);
+  }
+
+  fileLeave(event) {
+    console.log(event);
+  }
+
+  submitChatMessage(event: any): void {
     // Only submit real message (don't submit empty ones)
     if (this.message) {
-      let chat = new Chat(this.chatUser, new Date(), this.message);
+      let chat = new Chat(this.chatUser, new Date(), MessageType.MESSAGE, this.message);
       this.chatService.submitChat(chat, this.chatUserRef, this.chatRoom);
       this.message = ''; // Clear message after submit
     }
@@ -91,6 +118,14 @@ export class ChatComponent implements OnInit, AfterViewInit, OnChanges {
 
   isMyChat(chat: Chat): boolean {
     return this.chatUser === chat.user;
+  }
+
+  isMessageChat(chat: Chat): boolean {
+    return chat.messageType === MessageType.MESSAGE;
+  }
+
+  isImageChat(chat: Chat): boolean {
+    return chat.messageType === MessageType.IMAGE;
   }
 
   private loadChatComponent(chatRoom: ChatRoom, previousChatRoom: ChatRoom = null): void {

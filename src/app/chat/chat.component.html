@@ -1,14 +1,21 @@
 <div class="container-fluid">
   <div class="row">
     <div class="form-group">
+      <label for="fileDrop">Chat file</label>
+      <file-drop id="fileDrop" headertext="Drop files here" (onFileDrop)="fileDrop($event)" (onFileOver)="fileOver($event)" (onFileLeave)="fileLeave($event)">
+        <span class="hidden">optional content (don't set headertext then)</span>
+      </file-drop>
+    </div>
+    <div class="form-group">
       <label for="message">Chat message</label>
       <div class="input-group">
-        <emoji-input [(model)]="message" inputClass="form-control" searchClass="emoji-search-bootstrap" (keyup)="isTyping()" (keyup.enter)="submitChat()" (click)="openPopup(false)" (setPopupAction)="setPopupAction($event)"></emoji-input>
+        <emoji-input [(model)]="message" inputClass="form-control" searchClass="emoji-search-bootstrap" (keyup)="isTyping()" (keyup.enter)="submitChatMessage()"
+          (click)="openPopup(false)" (setPopupAction)="setPopupAction($event)"></emoji-input>
         <div class="input-group-addon btn btn-emoji" (click)="openPopup()"></div>
       </div>
     </div>
     <div class="form-group">
-      <button class="btn btn-primary" (click)="submitChat()">Submit</button>
+      <button class="btn btn-primary" (click)="submitChatMessage()">Submit</button>
       <div class="pull-right">
         <label for="notifyNewChats">Notify new messages</label>
         <input type="checkbox" [(ngModel)]="notifyNewChats" id="notifyNewChats" name="notifyNewChats">
@@ -22,7 +29,8 @@
       <li class="list-group-item chat" [ngClass]="{'mychat': isMyChat(chat)}" *ngFor="let chat of chats">
         <span class="chat-user" *ngIf="chat.user">{{chat.user.displayName}} </span>
         <span class="chat-timestamp">({{chat.timestamp}}): </span>
-        <span class="chat-message">{{chat.message}}</span>
+        <span class="chat-message" *ngIf="isMessageChat(chat)">{{chat.message}}</span>
+        <span class="chat-message" *ngIf="isImageChat(chat)"><img src="{{chat.message}}"/></span>
       </li>
     </ul>
   </div>

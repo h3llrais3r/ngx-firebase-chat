@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { AngularFireDatabase, AngularFireList, AngularFireObject } from 'angularfire2/database';
+import { AngularFireStorage, AngularFireUploadTask } from 'angularfire2/storage';
 import * as firebase from 'firebase/app';
+import { v4 as uuid } from 'uuid';
 
-import { Chat, ChatRoom, ChatUser } from './chat';
-import { StoreService } from '../store/store.service';
+import { Chat, ChatRoom, ChatUser, MessageType } from './chat';
 import { StringFormat } from '../shared/util/string-format';
 
 @Injectable()
@@ -22,8 +23,11 @@ export class ChatService {
   private CHATROOMS_CHATROOM_CHATS_REF = this.CHATROOMS_CHATROOM_REF + '/chats';
   private CHATROOMS_CHATROOM_USERS_REF = this.CHATROOMS_CHATROOM_REF + '/users';
   private CHATROOMS_CHATROOM_USERS_USER_REF = this.CHATROOMS_CHATROOM_USERS_REF + '/{1}';
+  // Files refs
+  private FILES_REF = '/files';
+  private FILES_FILE_REF = this.FILES_REF + '/{0}';
 
-  constructor(private db: AngularFireDatabase, private storeService: StoreService) { }
+  constructor(private db: AngularFireDatabase, private storage: AngularFireStorage) { }
 
   startChatRoom(name: string): Promise<firebase.database.Reference> {
     console.debug('Checking if chatroom ' + name + ' already exists...');
@@ -71,7 +75,7 @@ export class ChatService {
         console.debug('Chatroom ' + chatRoomName + ' created');
         // Push welcome message
         this.db.database.ref(StringFormat.format(this.CHATROOMS_CHATROOM_CHATS_REF, uuid))
-          .push(new Chat(null, new Date(), 'Welcome to chatroom ' + chatRoom.displayName));
+          .push(new Chat(null, new Date(), MessageType.MESSAGE, 'Welcome to chatroom ' + chatRoom.displayName));
         // Return chatroom reference
         return chatRoomRef;
       });
@@ -191,6 +195,11 @@ export class ChatService {
       console.debug('Getting chat users in chatbox...')
       return this.db.list(this.CHATBOX_USERS_REF);
     }
+  }
+
+  uploadFile(file: File): AngularFireUploadTask {
+    let filePath = StringFormat.format(this.FILES_FILE_REF, uuid());
+    return this.storage.upload(filePath, file);
   }
 
 }
