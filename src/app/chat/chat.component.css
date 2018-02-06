@@ -12,9 +12,19 @@
   font-style: italic;
 }
 
-.chat-message {
+.chat-message, .chat-image, .chat-file {
   font-weight: bold;
   word-wrap: break-word;
+}
+
+.chat-image > img {
+  height: 50px;
+  width: auto;
+}
+
+.chat-image > img:hover {
+  height: auto;
+  width: auto;
 }
 
 .mychat {

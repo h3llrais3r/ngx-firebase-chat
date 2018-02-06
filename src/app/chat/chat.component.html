@@ -30,8 +30,8 @@
         <span class="chat-user" *ngIf="chat.user">{{chat.user.displayName}} </span>
         <span class="chat-timestamp">({{chat.timestamp}}): </span>
         <span class="chat-message" *ngIf="isMessageChat(chat)">{{chat.message}}</span>
-        <span class="chat-message" *ngIf="isImageChat(chat)"><img src="{{chat.downloadUrl}}"/></span>
-        <span class="chat-message" *ngIf="isFileChat(chat)"><a href="{{chat.downloadUrl}}">{{chat.message}}</a></span>
+        <span class="chat-image" *ngIf="isImageChat(chat)"><img src="{{chat.downloadUrl}}"/></span>
+        <span class="chat-file" *ngIf="isFileChat(chat)"><a href="{{chat.downloadUrl}}">{{chat.message}}</a></span>
       </li>
     </ul>
   </div>
